@@ -4,7 +4,19 @@
     <title>Skill Gap Radar</title>
 </head>
 <body>
-    <h1>Skill Gap Radar</h1>
+
+<h1>Skill Gap Radar</h1>
+
+<!-- Navigation -->
+<p>
+    <a href="/history">View My Past Reports</a>
+
+    {% if session.get("role") == "teacher" %}
+        | <a href="/teacher">Teacher Dashboard</a>
+    {% endif %}
+
+    | <a href="/logout">Logout</a>
+</p>
 
 <form action="/full_analysis" method="post" enctype="multipart/form-data">
 
@@ -25,7 +37,6 @@
     <button type="submit">Analyze My Profile</button>
 
 </form>
-
 
 </body>
 </html>

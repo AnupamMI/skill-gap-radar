@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Analysis History</title>
+<style>
+body{font-family:Arial;background:#eef2f7;text-align:center;}
+.card{background:white;margin:20px auto;padding:20px;width:70%;border-radius:12px;box-shadow:0 6px 14px rgba(0,0,0,0.12);}
+ul{list-style:none;padding:0}
+li{margin:6px 0}
+.rate{color:purple;font-weight:bold}
+</style>
+</head>
+<body>
+
+<h1>My Past Reports</h1>
+<a href="/">Back to Analyzer</a>
+
+{% for r in reports %}
+<div class="card">
+
+<h3>Target Role: {{ r.role }}</h3>
+
+<b>Strong Skills</b>
+<ul>
+{% for s in r.strong %}
+<li>{{ s }}</li>
+{% endfor %}
+</ul>
+
+<b>Moderate Skills</b>
+<ul>
+{% for s in r.moderate %}
+<li>
+    {{ s }}
+
+    {% if r.ratings.get(s) %}
+        <span class="rate">
+        (Teacher Rated:
+            {% if r.ratings[s] == 5 %} Strong
+            {% elif r.ratings[s] == 3 %} Average
+            {% else %} Weak
+            {% endif %}
+        )
+        </span>
+    {% endif %}
+
+</li>
+{% endfor %}
+</ul>
+
+<b>Missing Skills</b>
+<ul>
+{% for s in r.missing %}
+<li>{{ s }}</li>
+{% endfor %}
+</ul>
+
+</div>
+{% endfor %}
+
+</body>
+</html>

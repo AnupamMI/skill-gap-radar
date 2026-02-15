@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Teacher Dashboard</title>
+<style>
+body{font-family:Arial;background:#eef2f7;text-align:center;}
+.card{background:white;margin:20px auto;padding:20px;width:80%;border-radius:12px;box-shadow:0 6px 14px rgba(0,0,0,0.12);}
+form{margin:6px;}
+button{margin-left:6px;}
+</style>
+</head>
+<body>
+
+<h1>Teacher Dashboard - Student Reports</h1>
+<a href="/">Back</a>
+
+{% for s in data %}
+<div class="card">
+
+<h3>{{s.name}} ({{s.email}})</h3>
+<b>Target Role:</b> {{s.role}}
+
+<h4>Moderate Skills (Needs Verification)</h4>
+
+{% for skill in s.moderate %}
+<form action="/rate" method="post">
+    <input type="hidden" name="report_id" value="{{s.report_id}}">
+    <input type="hidden" name="skill" value="{{skill}}">
+
+    <b>{{skill}}</b>
+
+    <button type="submit" name="rating" value="5">Strong</button>
+    <button type="submit" name="rating" value="3">Average</button>
+    <button type="submit" name="rating" value="1">Weak</button>
+
+    {% if skill in s.ratings %}
+        <span>
+        ➜ Rated:
+        {% if s.ratings[skill] == 5 %}
+            Strong
+        {% elif s.ratings[skill] == 3 %}
+            Average
+        {% else %}
+            Weak
+        {% endif %}
+        </span>
+    {% endif %}
+</form>
+{% endfor %}
+
+</div>
+{% endfor %}
+
+</body>
+</html>

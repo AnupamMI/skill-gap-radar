@@ -1,5 +1,5 @@
 flask
-pdfminer.six
-spacy
-requests
 gunicorn
+spacy
+pdfminer.six
+requests

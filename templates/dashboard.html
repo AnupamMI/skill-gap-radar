@@ -24,14 +24,28 @@ body { font-family: Arial; background:#eef2f7; text-align:center; }
 
 {% for skill,score in scores.items() %}
 <div class="skill">
+
 <b>{{ skill }}</b>
+
+{% if teacher and skill in teacher %}
+    <span style="color:purple;">
+    (Teacher Verified:
+        {% if teacher[skill] == 5 %} Strong
+        {% elif teacher[skill] == 3 %} Average
+        {% else %} Weak
+        {% endif %}
+    )
+    </span>
+{% endif %}
+
 <div class="bar">
 <div class="fill 
 {% if score >= 80 %}strong{% elif score >= 50 %}moderate{% else %}missing{% endif %}"
-style="width: {{ score|int }}%"></div>
-
+style="width: {{ score }}%;">
 </div>
-{{score}}%
+</div>
+
+{{ score }}%
 </div>
 {% endfor %}
 
@@ -43,15 +57,13 @@ style="width: {{ score|int }}%"></div>
 <p>👉 Learn {{s}} by building a project</p>
 {% endfor %}
 </div>
+
 <div class="card">
 <h2>Recommended Projects</h2>
-
 {% for p in projects %}
 <p>🚀 {{ p }}</p>
 {% endfor %}
-
 </div>
-
 
 <a href="/">Analyze Another Profile</a>
 

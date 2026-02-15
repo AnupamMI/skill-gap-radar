@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - Skill Gap Radar</title>
+    <style>
+        body { font-family: Arial; background:#eef2f7; text-align:center; }
+        .box {
+            background:white;
+            width:350px;
+            margin:80px auto;
+            padding:25px;
+            border-radius:12px;
+            box-shadow:0 6px 14px rgba(0,0,0,0.12);
+        }
+        input,select {
+            width:90%;
+            padding:10px;
+            margin:8px 0;
+        }
+        button {
+            padding:10px 18px;
+            background:#3498db;
+            color:white;
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+        }
+        a { display:block; margin-top:12px; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Create Account</h2>
+
+    <form method="POST">
+        <input type="text" name="name" placeholder="Full Name" required><br>
+        <input type="email" name="email" placeholder="Email" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+
+        <select name="role">
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+        </select><br>
+
+        <button type="submit">Register</button>
+    </form>
+
+    <a href="/login">Already have account?</a>
+</div>
+
+</body>
+</html>
