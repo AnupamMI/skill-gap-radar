@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Skill Gap Radar</title>
+<style>
+body { font-family: Arial; background:#eef2f7; text-align:center; }
+.card { background:white; padding:20px; margin:20px auto; width:65%; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,0.12); }
+
+.skill { margin:10px 0; text-align:left; }
+.bar { height:20px; border-radius:8px; background:#ddd; }
+.fill { height:100%; border-radius:8px; }
+
+.strong { background:#2ecc71; }
+.moderate { background:#f1c40f; }
+.missing { background:#e74c3c; }
+</style>
+</head>
+<body>
+
+<h1>Skill Gap Radar Report</h1>
+
+<div class="card">
+<h2>Skill Strength Meter</h2>
+
+{% for skill,score in scores.items() %}
+<div class="skill">
+<b>{{ skill }}</b>
+<div class="bar">
+<div class="fill 
+{% if score >= 80 %}strong{% elif score >= 50 %}moderate{% else %}missing{% endif %}"
+style="width: {{ score|int }}%"></div>
+
+</div>
+{{score}}%
+</div>
+{% endfor %}
+
+</div>
+
+<div class="card">
+<h2>Missing Skills Roadmap</h2>
+{% for s in missing %}
+<p>👉 Learn {{s}} by building a project</p>
+{% endfor %}
+</div>
+<div class="card">
+<h2>Recommended Projects</h2>
+
+{% for p in projects %}
+<p>🚀 {{ p }}</p>
+{% endfor %}
+
+</div>
+
+
+<a href="/">Analyze Another Profile</a>
+
+</body>
+</html>

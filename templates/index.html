@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Skill Gap Radar</title>
+</head>
+<body>
+    <h1>Skill Gap Radar</h1>
+
+<form action="/full_analysis" method="post" enctype="multipart/form-data">
+
+    <h3>Upload Resume</h3>
+    <input type="file" name="resume" accept=".pdf" required>
+
+    <h3>GitHub Username</h3>
+    <input type="text" name="username" required>
+
+    <h3>Select Target Role</h3>
+    <select name="role">
+        <option value="web developer">Web Developer</option>
+        <option value="data scientist">Data Scientist</option>
+        <option value="backend developer">Backend Developer</option>
+    </select>
+
+    <br><br>
+    <button type="submit">Analyze My Profile</button>
+
+</form>
+
+
+</body>
+</html>

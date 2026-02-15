@@ -1,0 +1,5 @@
+flask
+pdfminer.six
+spacy
+requests
+gunicorn
