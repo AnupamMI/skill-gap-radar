@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Messaging - Skill Gap Radar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #2c3e50;
+        }
+        
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: white;
+        }
+        
+        .back-nav {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .back-nav a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .back-nav a:hover {
+            color: #2980b9;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .header-info h2 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .header-info p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        .header-icons a {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .header-icons a:hover {
+            opacity: 0.8;
+            transform: scale(1.1);
+        }
+        
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .message {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 8px;
+            animation: slideIn 0.3s ease-in;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.sent {
+            align-items: flex-end;
+        }
+        
+        .message.received {
+            align-items: flex-start;
+        }
+        
+        .message-bubble {
+            max-width: 60%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+        
+        .message.received .message-bubble {
+            background: white;
+            color: #2c3e50;
+            border: 1px solid #ecf0f1;
+        }
+        
+        .message-meta {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 6px;
+            padding: 0 10px;
+        }
+        
+        .message.received .message-meta {
+            text-align: left;
+        }
+        
+        .message.sent .message-meta {
+            text-align: right;
+        }
+        
+        .sender-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #3498db;
+            padding: 0 10px;
+            margin-bottom: 5px;
+        }
+        
+        .file-preview {
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 6px;
+            font-size: 12px;
+        }
+        
+        .input-area {
+            background: white;
+            padding: 15px 20px;
+            border-top: 1px solid #ecf0f1;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .input-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: #3498db;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 5px;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            color: #2980b9;
+            transform: scale(1.1);
+        }
+        
+        #messageInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ecf0f1;
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: none;
+            max-height: 100px;
+            transition: all 0.3s;
+        }
+        
+        #messageInput:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .send-btn {
+            background: #3498db;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .send-btn:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: #27ae60;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .message-bubble {
+                max-width: 85%;
+            }
+            
+            .chat-header {
+                padding: 15px;
+            }
+            
+            .header-icons a {
+                margin-left: 12px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="back-nav">
+    <a href="/messenger">← Back to Conversations</a>
+</div>
+
+<div class="chat-container">
+    
+    <div class="chat-header">
+        <div class="header-info">
+            <h2 id="chatName">Chat</h2>
+            <p id="onlineStatus">
+                <span class="online-dot"></span> Online Now
+            </p>
+        </div>
+        <div class="header-icons">
+            <a href="javascript:void(0)" title="Voice Call">☎️</a>
+            <a href="javascript:void(0)" title="Video Call">📹</a>
+            <a href="javascript:void(0)" title="More Options">⋯</a>
+        </div>
+    </div>
+    
+    <div class="messages-container" id="messagesBox">
+        <p style="text-align: center; color: #95a5a6; font-size: 13px;">Loading conversation...</p>
+    </div>
+    
+    <div class="input-area">
+        <div class="input-actions">
+            <input type="file" id="fileInput" multiple>
+            <button class="action-btn" onclick="document.getElementById('fileInput').click()" title="Share File">📎</button>
+            <button class="action-btn" title="Send Location">📍</button>
+        </div>
+        <textarea id="messageInput" placeholder="Type a message..." rows="1"></textarea>
+        <button class="send-btn" onclick="sendMessage()" title="Send Message">✓</button>
+    </div>
+    
+</div>
+
+<script>
+let cid = {{ cid }};
+let userId = {{ session.user_id }};
+
+// Auto-resize textarea
+document.getElementById('messageInput').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+});
+
+// Send message on Shift+Enter or Ctrl+Enter
+document.getElementById('messageInput').addEventListener('keypress', function(e) {
+    if ((e.key === 'Enter' && !e.shiftKey) || (e.ctrlKey && e.key === 'Enter')) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+// Load messages initially
+loadMessages();
+
+// Load messages every 2 seconds for live updates
+setInterval(loadMessages, 2000);
+
+// File input handler
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    for (let file of e.target.files) {
+        uploadFile(file);
+    }
+});
+
+function loadMessages() {
+    fetch(`/get_messages/${cid}`)
+        .then(r => r.text())
+        .then(html => {
+            document.getElementById('messagesBox').innerHTML = html;
+            let box = document.getElementById('messagesBox');
+            box.scrollTop = box.scrollHeight;
+        })
+        .catch(err => console.error('Error loading messages:', err));
+}
+
+function sendMessage() {
+    let text = document.getElementById('messageInput').value.trim();
+    if (!text) return;
+    
+    let formData = new FormData();
+    formData.append('cid', cid);
+    formData.append('msg', text);
+    
+    fetch('/send_chat', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.text())
+    .then(() => {
+        document.getElementById('messageInput').value = '';
+        document.getElementById('messageInput').style.height = 'auto';
+        loadMessages();
+    })
+    .catch(err => console.error('Error sending message:', err));
+}
+
+function uploadFile(file) {
+    let formData = new FormData();
+    formData.append('cid', cid);
+    formData.append('file', file);
+    
+    fetch('/upload_media', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            loadMessages();
+        }
+    })
+    .catch(err => console.error('Error uploading file:', err));
+}
+</script>
+
+</body>
+</html>

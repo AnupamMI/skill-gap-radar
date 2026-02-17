@@ -1,42 +1,278 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Skill Gap Radar</title>
+    <title>Skill Gap Radar - Career Development Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .logo {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        
+        .tagline {
+            font-size: 16px;
+            color: #7f8c8d;
+            font-weight: 300;
+            margin-bottom: 30px;
+        }
+        
+        .nav-bar {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        
+        .nav-btn {
+            background: white;
+            padding: 10px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 13px;
+            border: 1px solid #ecf0f1;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .nav-btn:hover {
+            background: #f8f9fa;
+            border-color: #bdc3c7;
+        }
+        
+        .nav-btn.primary {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .nav-btn.primary:hover {
+            background: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .nav-btn.danger {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+        
+        .nav-btn.danger:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-section h2 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: 600;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 12px 14px;
+            border: 1px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .submit-btn {
+            background: #27ae60;
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .chat-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #3498db;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(52, 152, 219, 0.4);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .chat-fab:hover {
+            background: #2980b9;
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(52, 152, 219, 0.5);
+        }
+        
+        @media (max-width: 600px) {
+            .main-content {
+                padding: 25px;
+            }
+            
+            .form-section h2 {
+                font-size: 20px;
+            }
+            
+            .nav-bar {
+                flex-direction: column;
+            }
+            
+            .nav-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<h1>Skill Gap Radar</h1>
+<div class="container">
+    
+    <div class="header-section">
+        <div class="logo">📊 Skill Gap Radar</div>
+        <p class="tagline">AI-Powered Career Development & Skill Analysis Platform</p>
+        
+        <div class="nav-bar">
+            <a href="/history" class="nav-btn">📈 View My Reports</a>
+            <a href="/messages" class="nav-btn primary">💬 Messenger</a>
+            {% if session.get("role") == "teacher" %}
+                <a href="/teacher" class="nav-btn">👨‍🏫 Dashboard</a>
+            {% endif %}
+            <a href="/logout" class="nav-btn danger">🚪 Sign Out</a>
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="form-section">
+            <h2>Analyze Your Professional Profile</h2>
+            <p style="color: #7f8c8d; margin-bottom: 25px; font-size: 14px;">
+                Upload your resume and GitHub profile to receive a comprehensive skill gap analysis tailored to your target role.
+            </p>
+            
+            <form action="/full_analysis" method="post" enctype="multipart/form-data">
+                
+                <div class="form-group">
+                    <label for="resume">📄 Resume (PDF Format)</label>
+                    <input type="file" id="resume" name="resume" accept=".pdf" required>
+                    <small style="color: #95a5a6; margin-top: 5px;">Maximum file size: 5MB</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">🐙 GitHub Username</label>
+                    <input type="text" id="username" name="username" placeholder="e.g., john-developer" required>
+                    <small style="color: #95a5a6; margin-top: 5px;">We'll analyze your public repositories and contributions</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="role">🎯 Target Role</label>
+                    <select id="role" name="role" required>
+                        <option value="">-- Select a role --</option>
+                        <option value="web developer">💻 Web Developer</option>
+                        <option value="data scientist">📊 Data Scientist</option>
+                        <option value="backend developer">⚙️ Backend Developer</option>
+                    </select>
+                    <small style="color: #95a5a6; margin-top: 5px;">Select the role you're targeting for personalized recommendations</small>
+                </div>
+                
+                <button type="submit" class="submit-btn">🚀 Analyze Profile</button>
+            </form>
+        </div>
+    </div>
 
-<!-- Navigation -->
-<p>
-    <a href="/history">View My Past Reports</a>
+</div>
 
-    {% if session.get("role") == "teacher" %}
-        | <a href="/teacher">Teacher Dashboard</a>
-    {% endif %}
-
-    | <a href="/logout">Logout</a>
-</p>
-
-<form action="/full_analysis" method="post" enctype="multipart/form-data">
-
-    <h3>Upload Resume</h3>
-    <input type="file" name="resume" accept=".pdf" required>
-
-    <h3>GitHub Username</h3>
-    <input type="text" name="username" required>
-
-    <h3>Select Target Role</h3>
-    <select name="role">
-        <option value="web developer">Web Developer</option>
-        <option value="data scientist">Data Scientist</option>
-        <option value="backend developer">Backend Developer</option>
-    </select>
-
-    <br><br>
-    <button type="submit">Analyze My Profile</button>
-
-</form>
+<a href="/messages" class="chat-fab" title="Open Messenger">💬</a>
 
 </body>
 </html>

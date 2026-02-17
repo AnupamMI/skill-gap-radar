@@ -1,62 +1,280 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>My Analysis History</title>
+<title>Analysis History - Skill Gap Radar</title>
 <style>
-body{font-family:Arial;background:#eef2f7;text-align:center;}
-.card{background:white;margin:20px auto;padding:20px;width:70%;border-radius:12px;box-shadow:0 6px 14px rgba(0,0,0,0.12);}
-ul{list-style:none;padding:0}
-li{margin:6px 0}
-.rate{color:purple;font-weight:bold}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+    color: #2c3e50;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.page-header {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    color: #2c3e50;
+}
+
+.back-link {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.back-link:hover {
+    color: #2980b9;
+}
+
+.report-card {
+    background: white;
+    padding: 30px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    border-left: 4px solid #3498db;
+    transition: all 0.3s;
+}
+
+.report-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.report-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.role-badge {
+    background: #3498db;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.skill-section {
+    margin: 20px 0;
+}
+
+.skill-section h3 {
+    font-size: 14px;
+    color: #7f8c8d;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.skill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skill-tag {
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.skill-strong {
+    background: #d5f4e6;
+    color: #27ae60;
+}
+
+.skill-moderate {
+    background: #fef5e7;
+    color: #f39c12;
+}
+
+.skill-missing {
+    background: #fadbd8;
+    color: #e74c3c;
+}
+
+.teacher-verified {
+    display: inline-block;
+    background: #9b59b6;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.6;
+}
+
+.empty-state p {
+    color: #7f8c8d;
+    margin-bottom: 20px;
+}
+
+.empty-state a {
+    display: inline-block;
+    background: #3498db;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.empty-state a:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .report-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
 </style>
 </head>
 <body>
 
-<h1>My Past Reports</h1>
-<a href="/">Back to Analyzer</a>
+<div class="container">
+    
+    <div class="page-header">
+        <h1>📈 Your Analysis History</h1>
+        <a href="/" class="back-link">← Back to Home</a>
+    </div>
 
-{% for r in reports %}
-<div class="card">
+    {% if reports %}
+        {% for r in reports %}
+        <div class="report-card">
+            
+            <div class="report-header">
+                <span class="report-title">Target Role: <strong>{{ r.role|title }}</strong></span>
+                <span class="role-badge">Report #{{ r.id }}</span>
+            </div>
 
-<h3>Target Role: {{ r.role }}</h3>
+            <div class="skill-section">
+                <h3>✓ Strong Skills</h3>
+                <div class="skill-list">
+                    {% if r.strong %}
+                        {% for s in r.strong %}
+                        <div class="skill-tag skill-strong">
+                            <span>{{ s|title }}</span>
+                            {% if r.ratings.get(s) and r.ratings[s] == 5 %}
+                                <span class="teacher-verified">Verified</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: #95a5a6;">No strong skills recorded yet</p>
+                    {% endif %}
+                </div>
+            </div>
 
-<b>Strong Skills</b>
-<ul>
-{% for s in r.strong %}
-<li>{{ s }}</li>
-{% endfor %}
-</ul>
+            <div class="skill-section">
+                <h3>⬆ Skills to Improve</h3>
+                <div class="skill-list">
+                    {% if r.moderate %}
+                        {% for s in r.moderate %}
+                        <div class="skill-tag skill-moderate">
+                            <span>{{ s|title }}</span>
+                            {% if r.ratings.get(s) %}
+                                <span class="teacher-verified">
+                                    {% if r.ratings[s] == 5 %} Strong
+                                    {% elif r.ratings[s] == 3 %} Average
+                                    {% else %} Weak
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: #95a5a6;">No moderate skills recorded yet</p>
+                    {% endif %}
+                </div>
+            </div>
 
-<b>Moderate Skills</b>
-<ul>
-{% for s in r.moderate %}
-<li>
-    {{ s }}
+            <div class="skill-section">
+                <h3>✗ Missing Skills</h3>
+                <div class="skill-list">
+                    {% if r.missing %}
+                        {% for s in r.missing %}
+                        <div class="skill-tag skill-missing">{{ s|title }}</div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: #95a5a6;">No missing skills identified</p>
+                    {% endif %}
+                </div>
+            </div>
 
-    {% if r.ratings.get(s) %}
-        <span class="rate">
-        (Teacher Rated:
-            {% if r.ratings[s] == 5 %} Strong
-            {% elif r.ratings[s] == 3 %} Average
-            {% else %} Weak
-            {% endif %}
-        )
-        </span>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📊</div>
+            <p>You haven't generated any analysis reports yet.</p>
+            <p style="font-size: 13px; margin-bottom: 25px;">Start by uploading your resume and GitHub profile to get your personalized skill gap analysis.</p>
+            <a href="/">Generate Your First Report</a>
+        </div>
     {% endif %}
 
-</li>
-{% endfor %}
-</ul>
-
-<b>Missing Skills</b>
-<ul>
-{% for s in r.missing %}
-<li>{{ s }}</li>
-{% endfor %}
-</ul>
-
 </div>
-{% endfor %}
 
 </body>
 </html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Report Discussion</title>
+<style>
+body{font-family:Arial;background:#eef2f7;text-align:center;}
+.chatbox{width:70%;margin:20px auto;background:white;padding:20px;border-radius:12px;box-shadow:0 6px 14px rgba(0,0,0,0.12);}
+.msg{padding:8px;margin:6px;border-radius:8px}
+.student{background:#dff9fb;text-align:left}
+.teacher{background:#ffeaa7;text-align:right}
+</style>
+</head>
+<body>
+
+<h2>Discussion</h2>
+
+<div class="chatbox">
+
+{% for name,msg,sender,time in messages %}
+<div class="msg {{sender}}">
+<b>{{name}}</b>: {{msg}}
+</div>
+{% endfor %}
+
+<form method="POST" action="/send_message">
+<input type="hidden" name="report_id" value="{{report_id}}">
+<input type="text" name="message" required style="width:70%">
+<button type="submit">Send</button>
+</form>
+
+</div>
+
+<a href="/history">⬅ Back</a>
+
+</body>
+</html>

@@ -1,55 +1,287 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Teacher Dashboard</title>
+<title>Teacher Dashboard - Skill Gap Radar</title>
 <style>
-body{font-family:Arial;background:#eef2f7;text-align:center;}
-.card{background:white;margin:20px auto;padding:20px;width:80%;border-radius:12px;box-shadow:0 6px 14px rgba(0,0,0,0.12);}
-form{margin:6px;}
-button{margin-left:6px;}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+    color: #2c3e50;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-header h1 {
+    font-size: 28px;
+    color: #2c3e50;
+}
+
+.nav-links {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-links a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #2980b9;
+}
+
+.student-card {
+    background: white;
+    padding: 30px;
+    margin-bottom: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s;
+    border-left: 4px solid #3498db;
+}
+
+.student-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    transform: translateY(-2px);
+}
+
+.student-header {
+    border-bottom: 1px solid #ecf0f1;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.student-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.student-meta {
+    font-size: 13px;
+    color: #7f8c8d;
+}
+
+.role-info {
+    margin: 20px 0;
+    padding: 12px;
+    background: #ecf0f1;
+    border-radius: 6px;
+}
+
+.role-info strong {
+    color: #2c3e50;
+}
+
+.skill-section {
+    margin: 20px 0;
+}
+
+.skill-section h3 {
+    font-size: 13px;
+    color: #7f8c8d;
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.skill-item {
+    background: #f8f9fa;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.skill-name {
+    flex: 1;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.skill-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.skill-controls select {
+    padding: 6px 10px;
+    border: 1px solid #ecf0f1;
+    border-radius: 4px;
+    font-size: 13px;
+    background: white;
+    cursor: pointer;
+}
+
+.skill-controls button {
+    padding: 6px 14px;
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.skill-controls button:hover {
+    background: #229954;
+    transform: translateY(-1px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.6;
+}
+
+.empty-state p {
+    color: #7f8c8d;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .nav-links {
+        justify-content: center;
+    }
+    
+    .skill-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .skill-controls {
+        width: 100%;
+    }
+    
+    .skill-controls select {
+        flex: 1;
+    }
+}
 </style>
 </head>
 <body>
 
-<h1>Teacher Dashboard - Student Reports</h1>
-<a href="/">Back</a>
+<div class="container">
+    
+    <div class="dashboard-header">
+        <h1>👨‍🏫 Teacher Dashboard</h1>
+        <div class="nav-links">
+            <a href="/">Educator Home</a>
+            <a href="/logout">Sign Out</a>
+        </div>
+    </div>
 
-{% for s in data %}
-<div class="card">
+    {% if data %}
+        {% for d in data %}
+        <div class="student-card">
+            
+            <div class="student-header">
+                <div class="student-name">{{ d.name }}</div>
+                <div class="student-meta">{{ d.email }} • Report #{{ d.report_id }}</div>
+            </div>
 
-<h3>{{s.name}} ({{s.email}})</h3>
-<b>Target Role:</b> {{s.role}}
+            <div class="role-info">
+                <strong>Target Role:</strong> {{ d.role|title }}
+            </div>
 
-<h4>Moderate Skills (Needs Verification)</h4>
+            {% if d.strong %}
+            <div class="skill-section">
+                <h3>✓ Demonstrated Strengths</h3>
+                {% for s in d.strong %}
+                <div style="padding: 8px 0; color: #27ae60; font-weight: 500;">{{ s|title }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-{% for skill in s.moderate %}
-<form action="/rate" method="post">
-    <input type="hidden" name="report_id" value="{{s.report_id}}">
-    <input type="hidden" name="skill" value="{{skill}}">
+            {% if d.moderate %}
+            <div class="skill-section">
+                <h3>⬆ Areas for Development</h3>
+                {% for s in d.moderate %}
+                <form action="/rate" method="post">
+                    <div class="skill-item">
+                        <div class="skill-name">{{ s|title }}</div>
+                        <div class="skill-controls">
+                            <input type="hidden" name="report_id" value="{{ d.report_id }}">
+                            <input type="hidden" name="skill" value="{{ s }}">
+                            <select name="rating" required>
+                                <option value="">Rate this skill...</option>
+                                <option value="5">✓ Strong</option>
+                                <option value="3">~ Average</option>
+                                <option value="1">✗ Weak</option>
+                            </select>
+                            <button type="submit">Submit</button>
+                        </div>
+                    </div>
+                </form>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-    <b>{{skill}}</b>
+            {% if d.missing %}
+            <div class="skill-section">
+                <h3>✗ Skills to Develop</h3>
+                {% for s in d.missing %}
+                <div style="padding: 8px 0; color: #e74c3c; font-weight: 500;">{{ s|title }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
-    <button type="submit" name="rating" value="5">Strong</button>
-    <button type="submit" name="rating" value="3">Average</button>
-    <button type="submit" name="rating" value="1">Weak</button>
-
-    {% if skill in s.ratings %}
-        <span>
-        ➜ Rated:
-        {% if s.ratings[skill] == 5 %}
-            Strong
-        {% elif s.ratings[skill] == 3 %}
-            Average
-        {% else %}
-            Weak
-        {% endif %}
-        </span>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📚</div>
+            <p>No student reports available yet.</p>
+            <p style="font-size: 13px;">Student analyses will appear here as they complete their skill assessments.</p>
+        </div>
     {% endif %}
-</form>
-{% endfor %}
 
 </div>
-{% endfor %}
 
 </body>
 </html>
