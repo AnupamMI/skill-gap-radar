@@ -1,26 +1,28 @@
-from flask import Flask, render_template, request, session, redirect, jsonify
-import subprocess
 import os
 import sqlite3
-from datetime import datetime
+from flask import Flask, render_template, request, session, redirect, jsonify
 from werkzeug.utils import secure_filename
+from database import init_db
+from services import skill_analysis, github_analysis, matching_engine, roadmap_generator, progress_tracker
 
 app = Flask(__name__)
-app.secret_key = "skillgap_secret_key_123"
-
-UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
+app.secret_key = "skillgap_secret_key_pro"
+UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# Initialize Database
+init_db()
 
-# ---------------- HOME ----------------
+def get_db():
+    conn = sqlite3.connect("skillgap.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
 @app.route("/")
-def home():
-    if "user_id" not in session:
-        return redirect("/login")
-    return render_template("index.html", name=session["name"])
+def index():
+    return render_template("index.html")
 
-
-# ---------------- REGISTER ----------------
+# ---------------- AUTH ROUTES ----------------
 @app.route("/register", methods=["GET","POST"])
 def register():
     if request.method == "POST":
@@ -28,512 +30,352 @@ def register():
         email = request.form["email"]
         password = request.form["password"]
         role = request.form["role"]
-
-        conn = sqlite3.connect("skillgap.db")
-        cur = conn.cursor()
-
+        
+        db = get_db()
         try:
-            cur.execute(
-                "INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)",
-                (name,email,password,role)
-            )
-            conn.commit()
-            conn.close()
+            db.execute("INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)",
+                       (name,email,password,role))
+            db.commit()
             return redirect("/login")
-        except:
-            conn.close()
+        except Exception as e:
+            print(f"Registration error: {e}")
             return "Email already exists"
-
+        finally:
+            db.close()
     return render_template("register.html")
 
-
-# ---------------- LOGIN ----------------
 @app.route("/login", methods=["GET","POST"])
 def login():
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
-
-        conn = sqlite3.connect("skillgap.db")
-        cur = conn.cursor()
-
-        user = cur.execute(
-            "SELECT * FROM users WHERE email=? AND password=?",
-            (email,password)
-        ).fetchone()
-
-        conn.close()
-
+        
+        db = get_db()
+        user = db.execute("SELECT * FROM users WHERE email=? AND password=?",
+                         (email,password)).fetchone()
+        db.close()
+        
         if user:
-            session["user_id"] = user[0]
-            session["name"] = user[1]
-            session["role"] = user[4]
-            return redirect("/")
-        else:
-            return "Invalid login"
-
+            session["user_id"] = user["id"]
+            session["name"] = user["name"]
+            session["role"] = user["role"]
+            return redirect("/dashboard")
+        return "Invalid login"
     return render_template("login.html")
 
-
-# ---------------- LOGOUT ----------------
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/login")
 
-
-# ---------------- HISTORY ----------------
-@app.route("/history")
-def history():
-
+# ---------------- DASHBOARD ----------------
+@app.route("/dashboard")
+def dashboard():
     if "user_id" not in session:
         return redirect("/login")
-
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
-
-    rows = cur.execute("""
-        SELECT id, role_target, strong, moderate, missing
-        FROM reports
-        WHERE user_id=?
-        ORDER BY id DESC
-    """, (session["user_id"],)).fetchall()
-
-    reports = []
-
-    for r in rows:
-
-        report_id = r[0]
-
-        rating_rows = cur.execute(
-            "SELECT skill,rating FROM ratings WHERE report_id=?",
-            (report_id,)
-        ).fetchall()
-
-        rating_dict = {skill:rating for skill,rating in rating_rows}
-
-        reports.append({
-            "id": report_id,
-            "role": r[1],
-            "strong": r[2].split(",") if r[2] else [],
-            "moderate": r[3].split(",") if r[3] else [],
-            "missing": r[4].split(",") if r[4] else [],
-            "ratings": rating_dict
-        })
-
-    conn.close()
-
-    return render_template("history.html", reports=reports)
-
-@app.route("/teacher")
-def teacher_dashboard():
-
-    if "user_id" not in session or session["role"] != "teacher":
-        return redirect("/")
-
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
-
-    rows = cur.execute("""
-    SELECT reports.id, users.name, users.email, reports.role_target,
-           reports.strong, reports.moderate, reports.missing
-    FROM reports
-    JOIN users ON users.id = reports.user_id
-    ORDER BY reports.id DESC
-    """).fetchall()
-
-    data = []
-
-    for r in rows:
-
-        report_id = r[0]
-
-        # fetch ratings for this report
-        rating_rows = cur.execute(
-            "SELECT skill,rating FROM ratings WHERE report_id=?",
-            (report_id,)
-        ).fetchall()
-
-        rating_dict = {skill:rating for skill,rating in rating_rows}
-
-        data.append({
-            "report_id": report_id,
-            "name": r[1],
-            "email": r[2],
-            "role": r[3],
-            "strong": r[4].split(",") if r[4] else [],
-            "moderate": r[5].split(",") if r[5] else [],
-            "missing": r[6].split(",") if r[6] else [],
-            "ratings": rating_dict
-        })
-
-    conn.close()
-
-    return render_template("teacher.html", data=data)
-
-@app.route("/rate", methods=["POST"])
-def rate_skill():
-
-    if session.get("role") != "teacher":
-        return redirect("/")
-
-    report_id = request.form["report_id"]
-    skill = request.form["skill"]
-    rating = request.form["rating"]
-
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
-
-    cur.execute(
-        "INSERT INTO ratings(report_id,skill,rating) VALUES(?,?,?)",
-        (report_id,skill,rating)
-    )
-
-    conn.commit()
-    conn.close()
-
-    return redirect("/teacher")
-
-# ---------------- MESSAGES ----------------
-@app.route("/messages")
-def messages_home():
-    if "user_id" not in session:
-        return redirect("/login")
-
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
-
-    users = cur.execute("""
-        SELECT id, name, role FROM users
-        WHERE id != ?
-    """, (session["user_id"],)).fetchall()
-
-    conn.close()
-
-    return render_template("messages.html", users=users)
-
-
-@app.route("/messenger")
-def messenger():
-
-    if "user_id" not in session:
-        return redirect("/login")
-
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
-
-    chats = cur.execute("""
-    SELECT conversations.id, users.name
-    FROM conversations
-    JOIN participants ON conversations.id = participants.conversation_id
-    JOIN users ON users.id = participants.user_id
-    WHERE conversations.id IN (
-        SELECT conversation_id FROM participants WHERE user_id=?
-    ) AND users.id != ?
-    """,(session["user_id"],session["user_id"])).fetchall()
-
-    conn.close()
-
-    return render_template("messenger.html", chats=chats)
-
-
-@app.route("/start_chat/<int:user_id>")
-def start_chat(user_id):
-
-    if "user_id" not in session:
-        return redirect("/login")
-
-    me = session["user_id"]
-
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
-
-    # Find existing PRIVATE conversation between 2 users
-    conv = cur.execute("""
-    SELECT c.id
-    FROM conversations c
-    JOIN participants p1 ON c.id = p1.conversation_id
-    JOIN participants p2 ON c.id = p2.conversation_id
-    WHERE c.is_group = 0
-      AND p1.user_id = ?
-      AND p2.user_id = ?
-    """,(me,user_id)).fetchone()
-
-    if conv:
-        cid = conv[0]
+    
+    if session["role"] == "student":
+        return render_template("student_dashboard.html")
     else:
-        # Create new conversation
-        cur.execute("INSERT INTO conversations(is_group,name) VALUES(0,NULL)")
-        cid = cur.lastrowid
+        return render_template("teacher_dashboard.html")
 
-        cur.execute("INSERT INTO participants(conversation_id,user_id) VALUES(?,?)",(cid,me))
-        cur.execute("INSERT INTO participants(conversation_id,user_id) VALUES(?,?)",(cid,user_id))
-
-        conn.commit()
-
-    conn.close()
-
-    return redirect(f"/chatroom/{cid}")
-@app.route("/chatroom/<int:cid>")
-def chatroom(cid):
-
+@app.route("/discovery")
+def discovery():
     if "user_id" not in session:
         return redirect("/login")
+    return render_template("discovery.html")
 
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
-
-    allowed = cur.execute("""
-    SELECT 1 FROM participants
-    WHERE conversation_id=? AND user_id=?
-    """,(cid,session["user_id"])).fetchone()
-
-    if not allowed:
-        conn.close()
-        return "Unauthorized"
-
-    messages = cur.execute("""
-    SELECT users.name, messages.message, messages.timestamp, messages.sender_id
-    FROM messages
-    JOIN users ON users.id = messages.sender_id
-    WHERE conversation_id=?
-    ORDER BY messages.id
-    """,(cid,)).fetchall()
-
-    conn.close()
-
-    return render_template("chatroom.html", messages=messages, cid=cid)
-
-
-# -------- GET MESSAGES (AJAX) --------
-@app.route("/get_messages/<int:cid>")
-def get_messages(cid):
-    
+# ---------------- STUDENT FLOW ----------------
+@app.route("/analyze_profile", methods=["POST"])
+def analyze_profile():
     if "user_id" not in session:
-        return redirect("/login")
+        return jsonify({"error": "Unauthorized"}), 401
     
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
+    user_id = session["user_id"]
+    github_user = request.form.get("github_user")
+    resume = request.files.get("resume")
     
-    # Verify access
-    allowed = cur.execute("""
-        SELECT 1 FROM participants
-        WHERE conversation_id=? AND user_id=?
-    """, (cid, session["user_id"])).fetchone()
+    # Process Resume
+    if resume:
+        filename = secure_filename(resume.filename)
+        path = os.path.join(UPLOAD_FOLDER, filename)
+        resume.save(path)
+        skill_ids = skill_analysis.extract_skills_from_pdf(path)
+        skill_analysis.save_user_skills(user_id, skill_ids, 'resume')
     
-    if not allowed:
-        conn.close()
-        return "Unauthorized"
-    
-    messages = cur.execute("""
-        SELECT users.name, messages.message, messages.timestamp, messages.sender_id, messages.media
-        FROM messages
-        JOIN users ON users.id = messages.sender_id
-        WHERE conversation_id=?
-        ORDER BY messages.id ASC
-    """, (cid,)).fetchall()
-    
-    conn.close()
-    
-    html = ""
-    for name, msg, timestamp, sender_id, media in messages:
-        is_me = "sent" if sender_id == session["user_id"] else "received"
-        time_str = timestamp.split()[1][:5] if timestamp else ""
+    # Process GitHub
+    if github_user:
+        db = get_db()
+        db.execute("UPDATE users SET github_username=? WHERE id=?", (github_user, user_id))
+        db.commit()
+        db.close()
+        github_analysis.verify_github_skills(user_id, github_user)
         
-        html += f'''
-        <div class="message {is_me}">
-            {f'<div class="sender-name">{name}</div>' if is_me == "received" else ''}
-            <div class="message-bubble">
-                {msg}
-                {f'<div class="file-preview">📎 {media}</div>' if media else ''}
-            </div>
-            <div class="message-meta">{time_str} ✓</div>
-        </div>
-        '''
-    
-    return html
+    return jsonify({"success": True})
 
-
-# -------- UPLOAD MEDIA --------
-@app.route("/upload_media", methods=["POST"])
-def upload_media():
-    
+@app.route("/get_analysis")
+def get_analysis():
     if "user_id" not in session:
-        return jsonify({"success": False})
+        return jsonify({"error": "Unauthorized"}), 401
     
-    cid = request.form.get("cid")
-    file = request.files.get("file")
+    user_id = session["user_id"]
+    goal_role = request.args.get("goal", "Web Developer")
     
-    if not file:
-        return jsonify({"success": False})
+    analysis = skill_analysis.calculate_skill_gap(user_id, goal_role)
+    if not analysis:
+        return jsonify({"error": "No skills analyzed yet"}), 200
+        
+    return jsonify(analysis)
+
+@app.route("/request_mentorship", methods=["POST"])
+def request_mentorship():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
     
-    filename = secure_filename(file.filename)
-    filepath = os.path.join(UPLOAD_FOLDER, filename)
-    file.save(filepath)
+    db = get_db()
+    db.execute("""
+        INSERT INTO mentorship_requests(student_id, goal_role, project_idea) 
+        VALUES(?,?,?)
+    """, (session["user_id"], request.form["goal_role"], request.form["project_idea"]))
+    db.commit()
+    db.close()
+    return jsonify({"success": True})
+
+@app.route("/get_matches")
+def get_matches():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
     
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
+    matches = matching_engine.match_student_with_teachers(session["user_id"])
+    return jsonify({"matches": matches})
+
+@app.route("/generate-roadmap", methods=["POST"])
+def generate_roadmap():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
     
-    cur.execute("""
-        INSERT INTO messages(conversation_id, sender_id, message, media)
-        VALUES(?, ?, ?, ?)
-    """, (cid, session["user_id"], f"Shared a file", filename))
+    user_id = session["user_id"]
+    goal_role = request.form.get("goal_role")
     
-    conn.commit()
-    conn.close()
+    # Needs to get missing and moderate skills
+    analysis = skill_analysis.calculate_skill_gap(user_id, goal_role)
+    if not analysis:
+         return jsonify({"error": "Analysis not ready"})
+         
+    missing = [m["name"] for m in analysis["missing"]]
+    moderate = [m["name"] for m in analysis["moderate"]]
+    
+    rm = roadmap_generator.generate_roadmap(user_id, goal_role, missing, moderate)
+    return jsonify({"success": True, "roadmap": rm})
+
+@app.route("/get-roadmap")
+def get_roadmap():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    rm = roadmap_generator.get_user_roadmap(session["user_id"])
+    if not rm:
+        return jsonify({"error": "No roadmap found"})
+    return jsonify(rm)
+
+@app.route("/update-progress", methods=["POST"])
+def update_progress():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    step_id = request.form.get("step_id")
+    status = request.form.get("status")
+    roadmap_generator.update_step_status(step_id, status)
+    return jsonify({"success": True})
+
+@app.route("/get-skill-history")
+def get_skill_history():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+        
+    growth = progress_tracker.get_growth_indicators(session["user_id"])
+    return jsonify({"history": growth})
+
+# ---------------- COLLABORATION / GROUPS ----------------
+@app.route("/create_group", methods=["POST"])
+def create_group():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    name = request.form.get("name")
+    project_title = request.form.get("project_title")
+    description = request.form.get("description")
+    user_id = session["user_id"]
+    
+    db = get_db()
+    cursor = db.execute("""
+        INSERT INTO student_groups(name, project_title, description, leader_id)
+        VALUES(?,?,?,?)
+    """, (name, project_title, description, user_id))
+    group_id = cursor.lastrowid
+    
+    # Add leader to group
+    db.execute("""
+        INSERT INTO student_group_members(group_id, student_id)
+        VALUES(?,?)
+    """, (group_id, user_id))
+    db.commit()
+    db.close()
+    
+    return jsonify({"success": True, "group_id": group_id})
+
+@app.route("/join_group", methods=["POST"])
+def join_group():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+        
+    group_id = request.form.get("group_id")
+    user_id = session["user_id"]
+    
+    db = get_db()
+    try:
+        db.execute("INSERT INTO student_group_members(group_id, student_id) VALUES(?,?)", (group_id, user_id))
+        db.commit()
+        success = True
+    except sqlite3.IntegrityError:
+        success = False # Already joined
+    db.close()
+    
+    return jsonify({"success": success})
+
+@app.route("/update_project_status", methods=["POST"])
+def update_project_status():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+        
+    group_id = request.form.get("group_id")
+    message = request.form.get("message")
+    status = request.form.get("status")
+    
+    db = get_db()
+    if status:
+        db.execute("UPDATE student_groups SET status=? WHERE id=?", (status, group_id))
+    if message:
+        db.execute("INSERT INTO project_updates(group_id, message) VALUES(?,?)", (group_id, message))
+    db.commit()
+    db.close()
     
     return jsonify({"success": True})
 
-
-@app.route("/send_chat", methods=["POST"])
-def send_chat():
-    
-    cid = request.form.get("cid")
-    msg = request.form.get("msg")
-    
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
-    
-    cur.execute("""
-        INSERT INTO messages(conversation_id, sender_id, message)
-        VALUES(?, ?, ?)
-    """, (cid, session["user_id"], msg))
-    
-    conn.commit()
-    conn.close()
-    
-    return redirect(f"/chatroom/{cid}")
-
-
-@app.route("/full_analysis", methods=["POST"])
-def full_analysis():
-
+@app.route("/get_groups")
+def get_groups():
     if "user_id" not in session:
-        return redirect("/login")
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    db = get_db()
+    # Fetch all groups
+    groups = db.execute("""
+        SELECT g.*, u.name as leader_name 
+        FROM student_groups g
+        JOIN users u ON u.id = g.leader_id
+        ORDER BY g.created_at DESC
+    """).fetchall()
+    
+    result = []
+    for g in groups:
+        g_dict = dict(g)
+        members = db.execute("""
+            SELECT u.id, u.name 
+            FROM student_group_members m
+            JOIN users u ON u.id = m.student_id
+            WHERE m.group_id = ?
+        """, (g["id"],)).fetchall()
+        
+        updates = db.execute("""
+            SELECT * FROM project_updates 
+            WHERE group_id = ? 
+            ORDER BY timestamp DESC LIMIT 3
+        """, (g["id"],)).fetchall()
+        
+        g_dict["members"] = [dict(m) for m in members]
+        g_dict["updates"] = [dict(u) for u in updates]
+        result.append(g_dict)
+        
+    db.close()
+    return jsonify({"groups": result})
 
-    # -------- Save Resume --------
-    file = request.files["resume"]
-    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(filepath)
+@app.route("/get_students")
+def get_students():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+        
+    db = get_db()
+    # Fetch all students and their availability
+    students = db.execute("""
+        SELECT u.id, u.name, u.bio, u.avatar, IFNULL(sa.status, 'Available') as availability
+        FROM users u
+        LEFT JOIN student_availability sa ON sa.user_id = u.id
+        WHERE u.role = 'student'
+    """).fetchall()
+    db.close()
+    
+    return jsonify({"students": [dict(s) for s in students]})
 
-    # -------- Resume Analysis --------
-    resume_raw = subprocess.getoutput(f'python analyze_resume.py "{filepath}"')
-    resume_skills = [
-        line.strip("- ").strip()
-        for line in resume_raw.split("\n")
-        if line.startswith("-")
-    ]
+# ---------------- TEACHER FLOW ----------------
+@app.route("/get_incoming_requests")
+def get_incoming_requests():
+    if "user_id" not in session or session["role"] != "teacher":
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    db = get_db()
+    reqs = db.execute("""
+        SELECT r.id, u.name as student_name, r.goal_role, r.project_idea, r.status
+        FROM mentorship_requests r
+        JOIN users u ON u.id = r.student_id
+        WHERE r.status = 'pending'
+    """).fetchall()
+    db.close()
+    
+    return jsonify({"requests": [dict(r) for r in reqs]})
 
-    # -------- GitHub Analysis --------
-    username = request.form["username"]
-    github_raw = subprocess.getoutput(f'python github_analyzer.py "{username}"')
+@app.route("/accept_request", methods=["POST"])
+def accept_request():
+    if "user_id" not in session or session["role"] != "teacher":
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    req_id = request.form["request_id"]
+    db = get_db()
+    db.execute("UPDATE mentorship_requests SET status = 'matched' WHERE id = ?", (req_id,))
+    db.commit()
+    db.close()
+    return jsonify({"success": True})
 
-    verified_skills = [
-        line.split()[0].lower()
-        for line in github_raw.split("\n")
-        if "Score:" in line and "Weak" not in line
-    ]
+# ---------------- CHAT ----------------
+@app.route("/send_message", methods=["POST"])
+def send_message():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    db = get_db()
+    db.execute("""
+        INSERT INTO messages(sender_id, receiver_id, message) 
+        VALUES(?,?,?)
+    """, (session["user_id"], request.form["receiver_id"], request.form["message"]))
+    db.commit()
+    db.close()
+    return jsonify({"success": True})
 
-    # -------- Skill Gap --------
-    role = request.form["role"]
-    gap_raw = subprocess.getoutput(f'python skill_gap.py "{role}"')
+@app.route("/get_messages")
+def get_messages():
+    if "user_id" not in session:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    other_id = request.args.get("other_id")
+    db = get_db()
+    msgs = db.execute("""
+        SELECT * FROM messages 
+        WHERE (sender_id = ? AND receiver_id = ?) 
+           OR (sender_id = ? AND receiver_id = ?)
+        ORDER BY timestamp ASC
+    """, (session["user_id"], other_id, other_id, session["user_id"])).fetchall()
+    db.close()
+    
+    return jsonify({"messages": [dict(m) for m in msgs]})
 
-    strong, moderate, missing = [], [], []
-    section = None
-
-    for line in gap_raw.split("\n"):
-        if "Strong Skills" in line:
-            section = "strong"
-        elif "Moderate Skills" in line:
-            section = "moderate"
-        elif "Missing Skills" in line:
-            section = "missing"
-        elif line.strip().startswith("-"):
-            skill_name = line.strip()[2:]
-            if section == "strong":
-                strong.append(skill_name)
-            elif section == "moderate":
-                moderate.append(skill_name)
-            elif section == "missing":
-                missing.append(skill_name)
-
-    # -------- Score Meter --------
-    skill_scores = {}
-    for s in strong: skill_scores[s] = 90
-    for s in moderate: skill_scores[s] = 60
-    for s in missing: skill_scores[s] = 20
-
-    # -------- Recommendations --------
-    PROJECT_MAP = {
-        "react": "Build a Personal Portfolio SPA with React",
-        "node": "Create a REST API backend using Node.js",
-        "sql": "Develop a Student Database Management System",
-        "python": "Build a Data Analysis Automation Script",
-        "machine learning": "Create a Prediction Model using ML",
-        "javascript": "Build an Interactive Web Application",
-        "html": "Design a Multi-page Responsive Website",
-        "css": "Create a Modern UI Dashboard",
-        "git": "Maintain a version-controlled team project"
-    }
-
-    recommendations = [
-        PROJECT_MAP.get(skill, f"Build a project using {skill}")
-        for skill in missing
-    ]
-
-    # -------- SAVE OR UPDATE REPORT --------
-    conn = sqlite3.connect("skillgap.db")
-    cur = conn.cursor()
-
-    existing = cur.execute("""
-        SELECT id FROM reports
-        WHERE user_id=? AND role_target=?
-    """,(session["user_id"],role)).fetchone()
-
-    if existing:
-        report_id = existing[0]
-
-        cur.execute("""
-        UPDATE reports
-        SET strong=?, moderate=?, missing=?
-        WHERE id=?
-        """,(",".join(strong),",".join(moderate),",".join(missing),report_id))
-
-    else:
-        cur.execute("""
-        INSERT INTO reports(user_id, role_target, strong, moderate, missing)
-        VALUES(?,?,?,?,?)
-        """,(session["user_id"],role,",".join(strong),",".join(moderate),",".join(missing)))
-
-        report_id = cur.lastrowid
-
-    conn.commit()
-
-    # -------- FETCH TEACHER RATINGS --------
-    rating_rows = cur.execute(
-        "SELECT skill,rating FROM ratings WHERE report_id=?",
-        (report_id,)
-    ).fetchall()
-
-    conn.close()
-
-    teacher_ratings = {skill: rating for skill, rating in rating_rows}
-
-    return render_template(
-        "dashboard.html",
-        resume=resume_skills,
-        verified=verified_skills,
-        strong=strong,
-        moderate=moderate,
-        missing=missing,
-        scores=skill_scores,
-        projects=recommendations,
-        teacher=teacher_ratings
-    )
-
-
-
-
-# ---------------- RUN ----------------
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)

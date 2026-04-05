@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Network & Discovery - Skill Gap Radar{% endblock %}
+
+{% block layout %}
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <!-- Render Nav Links based on Role -->
+        {% if session.role == 'student' %}
+            <a href="/dashboard" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Dashboard
+            </a>
+            <a href="#" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                Roadmap
+            </a>
+        {% else %}
+            <a href="/dashboard" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Dashboard
+            </a>
+        {% endif %}
+        
+        <a href="/discovery" class="nav-link active">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            Discovery Network
+        </a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="font-display">Community Discovery</h2>
+                    <p class="text-muted">Find peers, see what they are building, and connect.</p>
+                </div>
+                
+                <div class="flex gap-4">
+                    <input type="text" class="form-control" placeholder="Search skills, goals..." style="width: 250px;">
+                    <select class="form-control">
+                        <option value="all">All Goals</option>
+                        <option value="web">Web Developer</option>
+                        <option value="ml">ML Engineer</option>
+                        <option value="data">Data Scientist</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Groups Grid -->
+            <h3 class="font-display mb-4">Active Project Groups</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;" id="groups-grid">
+                <!-- Data injected via JS -->
+                 <p class="text-muted">Loading groups...</p>
+            </div>
+
+            <!-- Discovery Grid -->
+            <h3 class="font-display mb-4">Students</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;" id="discovery-grid">
+                <!-- Data injected via JS -->
+                <p class="text-muted">Loading students...</p>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", fetchData);
+
+    async function fetchData() {
+        const [studRes, grpRes] = await Promise.all([
+            fetch('/get_students'),
+            fetch('/get_groups')
+        ]);
+        
+        const studData = await studRes.json();
+        const grpData = await grpRes.json();
+
+        renderStudents(studData.students || []);
+        renderGroups(grpData.groups || []);
+    }
+
+    function renderStudents(students) {
+        const grid = document.getElementById('discovery-grid');
+        grid.innerHTML = '';
+        
+        if(students.length === 0) {
+            grid.innerHTML = '<p class="text-muted">No students found.</p>';
+            return;
+        }
+
+        students.forEach(st => {
+            const availColor = st.availability === 'Available' ? 'var(--success)' : 'var(--warning)';
+            
+            grid.innerHTML += `
+                <div class="card" style="display:flex; flex-direction:column; justify-content:space-between; transition: transform 0.2s;">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-display text-main" style="font-size: 1.1rem;">${st.name}</h3>
+                                <div class="text-secondary" style="font-size: 0.85rem; font-weight: 500;">Role: Student</div>
+                            </div>
+                            <div class="text-xs" style="color: ${availColor}; font-weight: 600; border: 1px solid ${availColor}; padding: 0.2rem 0.5rem; border-radius: 4px;">
+                                ${st.availability}
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted text-sm mb-4">${st.bio || 'Driven learner looking to collaborate.'}</p>
+                    </div>
+                    
+                    <button class="btn btn-secondary w-full" style="font-size: 0.8rem;">Invite to Collaborate</button>
+                </div>
+            `;
+        });
+    }
+
+    function renderGroups(groups) {
+        const grid = document.getElementById('groups-grid');
+        grid.innerHTML = '';
+        
+        if(groups.length === 0) {
+            grid.innerHTML = '<p class="text-muted">No public groups found.</p>';
+            return;
+        }
+
+        groups.forEach(g => {
+            let statusColor = 'var(--primary)';
+            if(g.status === 'Completed') statusColor = 'var(--success)';
+            
+            const members = g.members.map(m => m.name).join(', ') || 'None';
+
+            grid.innerHTML += `
+                <div class="card" style="background: var(--bg-hover); display:flex; flex-direction:column; justify-content:space-between; transition: transform 0.2s;">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-display text-main" style="font-size: 1.1rem;">${g.name}</h3>
+                                <div class="text-primary font-bold" style="font-size: 0.85rem;">Project: ${g.project_title}</div>
+                            </div>
+                            <div class="badge badge-primary" style="background: ${statusColor}20; color: ${statusColor};">
+                                ${g.status}
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted text-sm mb-4" style="min-height: 2.5rem;">${g.description || 'No description provided.'}</p>
+                        
+                        <div class="text-xs text-muted mb-4">
+                            <strong style="text-transform: uppercase;">Team:</strong> ${members}
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary w-full" style="font-size: 0.8rem;" onclick="requestJoin(${g.id})">Request to Join</button>
+                </div>
+            `;
+        });
+    }
+
+    async function requestJoin(groupId) {
+        const fd = new FormData();
+        fd.append('group_id', groupId);
+        const res = await fetch('/join_group', {method: 'POST', body: fd});
+        const data = await res.json();
+        
+        if(data.success) {
+            alert('Successfully joined the group!');
+            fetchData();
+        } else {
+            alert('Failed to join or you are already a member.');
+        }
+    }
+</script>
+{% endblock %}

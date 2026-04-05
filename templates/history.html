@@ -10,11 +10,11 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #0A1F44 0%, #1A1A1A 100%);
     min-height: 100vh;
     padding: 40px 20px;
-    color: #2c3e50;
+    color: #FFFFFF;
 }
 
 .container {
@@ -23,60 +23,74 @@ body {
 }
 
 .page-header {
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 45px 40px;
+    border-radius: 16px;
     margin-bottom: 30px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .page-header h1 {
-    font-size: 28px;
-    color: #2c3e50;
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #FFFFFF 0%, #B8C6DB 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -1px;
 }
 
 .back-link {
-    color: #3498db;
+    color: #FFFFFF;
     text-decoration: none;
     font-weight: 600;
-    transition: color 0.3s;
+    transition: all 0.3s;
+    font-size: 14px;
+    letter-spacing: 0.3px;
 }
 
 .back-link:hover {
-    color: #2980b9;
+    color: #B8C6DB;
+    text-decoration: underline;
 }
 
 .report-card {
-    background: white;
-    padding: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 35px;
     margin-bottom: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    border-left: 4px solid #3498db;
-    transition: all 0.3s;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border-left: 3px solid #0A1F44;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
 
 .report-card:hover {
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .report-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     padding-bottom: 15px;
-    border-bottom: 1px solid #ecf0f1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .report-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #2c3e50;
+    font-size: 20px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.5px;
 }
 
 .role-badge {

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mentor Requests - Skill Gap Radar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0A1F44 0%, #1A1A1A 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #FFFFFF;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF 0%, #B8C6DB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .back-link, .create-btn {
+            padding: 11px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+        
+        .back-link {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .create-btn {
+            background: linear-gradient(135deg, #2ED573 0%, #27a952 100%);
+            color: white;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 213, 115, 0.3);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: #B8C6DB;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            letter-spacing: 0.3px;
+        }
+        
+        .tab.active {
+            color: #2ED573;
+            border-bottom-color: #2ED573;
+            background: rgba(46, 213, 115, 0.1);
+        }
+        
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #FFFFFF;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .request-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            border-left: 3px solid #0A1F44;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .request-card.approved {
+            border-left-color: #2ED573;
+        }
+        
+        .request-card.rejected {
+            border-left-color: #FF6B6B;
+            opacity: 0.8;
+        }
+        
+        .request-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .group-info h3 {
+            font-size: 18px;
+            color: #FFFFFF;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        
+        .group-info p {
+            font-size: 13px;
+            color: #B8C6DB;
+            letter-spacing: 0.3px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+            border-color: #FFC107;
+        }
+        
+        .status-approved {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ED573;
+            border-color: #2ED573;
+        }
+        
+        .status-rejected {
+            background: rgba(255, 107, 107, 0.2);
+            color: #FF6B6B;
+            border-color: #FF6B6B;
+        }
+        
+        .request-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-label {
+            font-size: 11px;
+            color: #B8C6DB;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        
+        .detail-value {
+            font-size: 15px;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        
+        .request-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-approve {
+            background: linear-gradient(135deg, #2ED573 0%, #27a952 100%);
+            color: white;
+        }
+        
+        .btn-approve:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 213, 115, 0.3);
+        }
+        
+        .btn-reject {
+            background: linear-gradient(135deg, #FF6B6B 0%, #E63946 100%);
+            color: white;
+        }
+        
+        .btn-reject:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        
+        .empty-state p {
+            color: #B8C6DB;
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #B8C6DB;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #0A1F44;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 3px solid;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+        
+        .alert-success {
+            background: rgba(46, 213, 115, 0.1);
+            color: #2ED573;
+            border-color: #2ED573;
+        }
+        
+        .alert-error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #FF6B6B;
+            border-color: #FF6B6B;
+        }
+        
+        @media (max-width: 768px) {
+            .request-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .request-actions {
+                flex-direction: column;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📋 Mentor Requests</h1>
+        <div class="header-actions">
+            <a href="/teacher" class="back-link">← Teacher Dashboard</a>
+            <button class="create-btn" onclick="window.location.href='/create_slots'">+ Create Slot</button>
+        </div>
+    </div>
+    
+    <div id="alertContainer"></div>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('pending')">⏳ Pending <span id="pendingCount">(0)</span></button>
+        <button class="tab" onclick="switchTab('approved')">✓ Approved <span id="approvedCount">(0)</span></button>
+        <button class="tab" onclick="switchTab('rejected')">✗ Rejected <span id="rejectedCount">(0)</span></button>
+    </div>
+    
+    <div id="pendingTab" class="tab-content active">
+        <div id="pendingContainer" class="loading">
+            <div class="spinner"></div>
+            <p>Loading pending requests...</p>
+        </div>
+    </div>
+    
+    <div id="approvedTab" class="tab-content">
+        <div id="approvedContainer" class="loading">
+            <div class="spinner"></div>
+            <p>Loading approved requests...</p>
+        </div>
+    </div>
+    
+    <div id="rejectedTab" class="tab-content">
+        <div id="rejectedContainer" class="loading">
+            <div class="spinner"></div>
+            <p>Loading rejected requests...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+let allRequests = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadRequests();
+});
+
+function loadRequests() {
+    fetch('/teacher_requests')
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                allRequests = data.requests;
+                renderRequests();
+            } else {
+                showAlert('Error loading requests', 'error');
+            }
+        })
+        .catch(err => {
+            showAlert('Error: ' + err.message, 'error');
+            console.error(err);
+        });
+}
+
+function renderRequests() {
+    let pending = allRequests.filter(r => r.status === 'pending');
+    let approved = allRequests.filter(r => r.status === 'approved');
+    let rejected = allRequests.filter(r => r.status === 'rejected');
+    
+    document.getElementById('pendingCount').textContent = '(' + pending.length + ')';
+    document.getElementById('approvedCount').textContent = '(' + approved.length + ')';
+    document.getElementById('rejectedCount').textContent = '(' + rejected.length + ')';
+    
+    renderTab(pending, 'pendingContainer', true);
+    renderTab(approved, 'approvedContainer', false);
+    renderTab(rejected, 'rejectedContainer', false);
+}
+
+function renderTab(requests, containerId, showActions) {
+    let container = document.getElementById(containerId);
+    
+    if (requests.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p>No requests in this category.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    requests.forEach(req => {
+        html += `
+            <div class="request-card ${req.status}">
+                <div class="request-header">
+                    <div class="group-info">
+                        <h3>👥 ${escapeHtml(req.group_name)}</h3>
+                        <p>Led by: ${escapeHtml(req.leader_name)}</p>
+                    </div>
+                    <span class="status-badge status-${req.status}">${req.status}</span>
+                </div>
+                
+                <div class="request-details">
+                    <div class="detail-item">
+                        <span class="detail-label">📅 Day</span>
+                        <span class="detail-value">${req.day}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">⏰ Time</span>
+                        <span class="detail-value">${req.start_time} - ${req.end_time}</span>
+                    </div>
+                </div>
+                
+                ${showActions ? `
+                    <div class="request-actions">
+                        <button class="btn btn-approve" onclick="approveRequest(${req.id})">✓ Approve</button>
+                        <button class="btn btn-reject" onclick="rejectRequest(${req.id})">✗ Reject</button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function switchTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabName + 'Tab').classList.add('active');
+    
+    // Add active class to clicked tab
+    event.target.closest('.tab').classList.add('active');
+}
+
+function approveRequest(reqId) {
+    if (confirm('Approve this mentorship request?')) {
+        let btn = event.target;
+        btn.disabled = true;
+        btn.textContent = 'Approving...';
+        
+        fetch(`/approve_mentor_request/${reqId}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('✓ Request approved!', 'success');
+                    setTimeout(() => {
+                        loadRequests();
+                    }, 1000);
+                } else {
+                    showAlert('Error: ' + data.error, 'error');
+                    btn.disabled = false;
+                    btn.textContent = '✓ Approve';
+                }
+            })
+            .catch(err => {
+                showAlert('Error: ' + err.message, 'error');
+                btn.disabled = false;
+                btn.textContent = '✓ Approve';
+            });
+    }
+}
+
+function rejectRequest(reqId) {
+    if (confirm('Reject this mentorship request?')) {
+        let btn = event.target;
+        btn.disabled = true;
+        btn.textContent = 'Rejecting...';
+        
+        fetch(`/reject_mentor_request/${reqId}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('✗ Request rejected.', 'success');
+                    setTimeout(() => {
+                        loadRequests();
+                    }, 1000);
+                } else {
+                    showAlert('Error: ' + data.error, 'error');
+                    btn.disabled = false;
+                    btn.textContent = '✗ Reject';
+                }
+            })
+            .catch(err => {
+                showAlert('Error: ' + err.message, 'error');
+                btn.disabled = false;
+                btn.textContent = '✗ Reject';
+            });
+    }
+}
+
+function showAlert(message, type) {
+    let container = document.getElementById('alertContainer');
+    let alert = document.createElement('div');
+    alert.className = 'alert alert-' + type;
+    alert.textContent = message;
+    container.appendChild(alert);
+    
+    setTimeout(() => {
+        alert.remove();
+    }, 4000);
+}
+
+function escapeHtml(text) {
+    let map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+</script>
+
+</body>
+</html>

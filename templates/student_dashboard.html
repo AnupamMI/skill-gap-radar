@@ -1,0 +1,835 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Skill Gap Radar{% endblock %}
+
+{% block layout %}
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="#" class="nav-link active" onclick="switchTab('tab-dashboard', this); return false;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            Dashboard
+        </a>
+        <a href="#" class="nav-link" onclick="switchTab('tab-scan', this); return false;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+            Radar Scan
+        </a>
+        <a href="#" class="nav-link" id="nav-roadmap" onclick="switchTab('tab-roadmap', this); return false;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            Roadmap
+        </a>
+        <a href="#" class="nav-link" id="nav-groups" onclick="switchTab('tab-groups', this); return false;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            My Groups
+        </a>
+        <a href="#" class="nav-link" id="nav-mentorship" onclick="switchTab('tab-mentorship', this); return false;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+            Mentorship
+        </a>
+        <a href="#" class="nav-link" id="nav-discovery" onclick="switchTab('tab-discovery', this); return false;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            Discovery Network
+        </a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div style="max-width: 1280px; margin: 0 auto; width: 100%;">
+            
+            <!-- Dashboard Tab -->
+            <section id="tab-dashboard" class="app-section active">
+                <h2 class="font-display mb-6">Welcome Back, {{ session.name }}</h2>
+                
+                <div class="stats-row">
+                    <div class="card" style="border-top: 3px solid var(--primary);">
+                        <div class="text-xs text-muted font-bold uppercase mb-1" style="letter-spacing: 0.05em">Match Score</div>
+                        <div class="font-display" style="font-size: 2rem; color: var(--primary);"><span id="dash-stat-score">0</span>%</div>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--secondary);">
+                        <div class="text-xs text-muted font-bold uppercase mb-1" style="letter-spacing: 0.05em">Verified Skills</div>
+                        <div class="font-display" style="font-size: 2rem;" id="dash-stat-skills">0</div>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--warning);">
+                        <div class="text-xs text-muted font-bold uppercase mb-1" style="letter-spacing: 0.05em">Active Projects</div>
+                        <div class="font-display" style="font-size: 2rem;">1</div>
+                    </div>
+                    <div class="card" style="border-top: 3px solid var(--success);">
+                        <div class="text-xs text-muted font-bold uppercase mb-1" style="letter-spacing: 0.05em">Mentorships</div>
+                        <div class="font-display" style="font-size: 2rem;">None</div>
+                    </div>
+                </div>
+
+                <div class="dash-grid">
+                    <!-- Left Column: Main Actions & Overview -->
+                    <div class="flex-col gap-6">
+                        <div class="card mb-6" style="background: var(--bg-hover);">
+                            <h3 class="font-display mb-2">Your Career Command Center</h3>
+                            <p class="text-muted text-sm" style="line-height: 1.6;">Navigate through your radar scan to discover skill gaps, generate an AI roadmap to fix them, and connect with mentors to guide you.</p>
+                        </div>
+        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div class="card flex-col justify-center items-center text-center" style="cursor: pointer; transition: transform 0.2s; min-height: 160px;" onclick="document.querySelector('.nav-link:nth-child(2)').click()">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary);">▲</div>
+                                <h4 class="font-display mb-2" style="font-size: 1rem;">Run Radar Scan</h4>
+                                <p class="text-muted" style="font-size: 0.85rem;">Analyze resume & GitHub</p>
+                            </div>
+                            <div class="card flex-col justify-center items-center text-center" style="cursor: pointer; transition: transform 0.2s; min-height: 160px;" onclick="document.querySelector('#nav-roadmap').click()">
+                                <div style="font-size: 2rem; margin-bottom: 0.5rem; color: #ffd700;">◆</div>
+                                <h4 class="font-display mb-2" style="font-size: 1rem;">View Roadmap</h4>
+                                <p class="text-muted" style="font-size: 0.85rem;">Your custom learning path</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Activity Feed -->
+                    <div class="flex-col gap-6">
+                        <div class="card" style="height: 100%;">
+                            <h3 class="font-display mb-4">Recent Activity</h3>
+                            <div class="flex-col">
+                                <div class="feed-item">
+                                    <div class="feed-icon text-primary">🚀</div>
+                                    <div>
+                                        <div class="text-sm font-medium">Account Created</div>
+                                        <div class="text-xs text-muted mt-1">Welcome to Skill Gap Radar</div>
+                                    </div>
+                                </div>
+                                <div class="feed-item">
+                                    <div class="feed-icon text-secondary">▲</div>
+                                    <div>
+                                        <div class="text-sm font-medium">System Ready</div>
+                                        <div class="text-xs text-muted mt-1">Awaiting your first Radar Scan</div>
+                                    </div>
+                                </div>
+                                <div class="feed-item">
+                                    <div class="feed-icon" style="color: var(--success);">👥</div>
+                                    <div>
+                                        <div class="text-sm font-medium">Discovery Network Live</div>
+                                        <div class="text-xs text-muted mt-1">You can now explore student groups</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Radar Scan Tab -->
+            <section id="tab-scan" class="app-section">
+                <div class="dash-grid">
+                    <!-- Left Column: Input & Results -->
+                    <div class="flex-col gap-6">
+                        <div class="card">
+                            <h2 class="font-display mb-4 flex items-center gap-2"><span class="text-primary">▲</span> Profile Analysis</h2>
+                            <form id="analysis-form" class="flex-col gap-4">
+                                <div class="form-group mb-2">
+                                    <label class="form-label">GitHub Username</label>
+                                    <input type="text" name="github_user" class="form-control" placeholder="e.g. torvalds" id="github_input">
+                                </div>
+                                <div class="form-group mb-4">
+                                    <label class="form-label">Resume PDF</label>
+                                    <input type="file" name="resume" accept=".pdf" class="form-control" id="resume_input">
+                                </div>
+                                <button type="button" class="btn btn-primary w-full" style="padding: 0.8rem;" onclick="runAnalysis()">RUN RADAR SCAN</button>
+                            </form>
+                        </div>
+                        
+                        <div id="radar-details" style="display:none;" class="flex-col gap-6">
+                            <!-- Next Best Action -->
+                            <div id="quick-wins" style="display:none; padding: 1.5rem; background: var(--warning-light); border-radius: var(--radius-md); border: 1px solid var(--warning);">
+                                <h4 class="font-display" style="color: var(--warning); font-size: 0.8rem; margin-bottom: 0.5rem; letter-spacing: 0.05em;">🚀 NEXT BEST ACTION</h4>
+                                <div id="next-action-task" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;"></div>
+                                <div class="flex gap-4 text-muted" style="font-size: 0.85rem;">
+                                    <span id="next-action-time" style="background: var(--bg-hover); padding: 0.2rem 0.5rem; border-radius: 4px;"></span>
+                                    <span id="next-action-impact" class="text-primary font-bold"></span>
+                                </div>
+                                <button class="btn btn-secondary w-full mt-4" onclick="generateRoadmapAndSwitch()">Generate Full Roadmap</button>
+                            </div>
+                            
+                            <div class="card">
+                                <h3 class="font-display mb-4">Identified Skills</h3>
+                                <div id="skills-list" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
+                                    <!-- Skill pills injected -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Radar Chart -->
+                    <div class="flex-col gap-6">
+                        <div id="radar-section" style="display:none; height: 100%;" class="card flex-col items-center justify-center">
+                            <h2 class="font-display mb-6 text-center">Skill Radar</h2>
+                            <div style="width: 100%; max-width: 500px; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
+                                <canvas id="skillRadar"></canvas>
+                            </div>
+                            
+                            <div class="text-center mt-6">
+                                <span id="match-pct" class="font-display text-primary" style="font-size: 3rem; font-weight: 700;">0%</span>
+                                <p class="text-muted" style="font-size: 0.85rem; letter-spacing: 0.05em; text-transform: uppercase;">Match Score For <span id="goal-title">Target Role</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Roadmap Tab -->
+            <section id="tab-roadmap" class="app-section">
+                <div class="card" id="roadmap-section" style="padding: 3rem;">
+                    <h2 class="mb-6 font-display flex items-center gap-2 text-2xl"><span style="color: #ffd700">◆</span> Personalized AI Roadmap</h2>
+                    <div id="roadmap-container" class="flex-col gap-6 text-muted" style="text-align: center; padding: 4rem 0;">
+                        <!-- Defaults until generated -->
+                        <div style="font-size: 4rem; margin-bottom: 1.5rem;">🗺️</div>
+                        <p style="font-size: 1.2rem;">No roadmap generated yet.</p>
+                        <p style="font-size: 1rem; margin-top: 0.5rem;">Go to the Radar Scan tab to generate your AI guided learning path.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Groups & Project Tracking Tab -->
+            <section id="tab-groups" class="app-section">
+                <div class="flex-col gap-6">
+                    <div class="card">
+                        <h2 class="mb-4 flex items-center gap-2"><span class="text-primary">◆</span> My Learning Group</h2>
+                        
+                        <!-- Toggle Views (No Group vs Has Group) using JS later, showing both templates for now -->
+                        <div id="no-group-view">
+                            <p class="text-muted mb-4">You are not part of any collaboration group right now. Create a new group to start a project, or discover existing groups.</p>
+                            
+                            <form id="create-group-form" class="flex-col gap-4 bg-hover p-4" style="border-radius: var(--radius-md); border: 1px solid var(--border);">
+                                <h3 class="font-display" style="font-size: 1rem;">Create a New Group</h3>
+                                <div class="form-group">
+                                    <label class="form-label">Group Name</label>
+                                    <input type="text" name="name" class="form-control" placeholder="e.g. Frontend Enthusiasts API Team" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Project Title</label>
+                                    <input type="text" name="project_title" class="form-control" placeholder="e.g. Next.js E-Commerce platform" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Goal / Description</label>
+                                    <textarea name="description" class="form-control" placeholder="We need someone who knows SQL..."></textarea>
+                                </div>
+                                <button type="button" class="btn btn-primary w-full" onclick="createGroup()">Create Group</button>
+                            </form>
+                            <a href="/discovery" class="btn btn-secondary w-full text-center mt-4" style="display:block">Browse Public Groups to Join</a>
+                        </div>
+                        
+                        <div id="active-group-view" style="display:none;">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h3 class="font-display text-main" id="my-group-name" style="font-size: 2rem;">Group Name</h3>
+                                    <div class="text-secondary font-bold" id="my-group-project" style="font-size: 1.1rem; margin-top: 0.5rem;">Project: X</div>
+                                </div>
+                                <span class="badge badge-primary" id="my-group-status" style="font-size: 1rem; padding: 0.5rem 1rem;">Active</span>
+                            </div>
+                            
+                            <div class="dash-grid">
+                                <div class="flex-col gap-6">
+                                    <div class="card">
+                                        <h4 class="text-muted mb-4 text-sm uppercase font-bold" style="letter-spacing: 0.05em">Team Members</h4>
+                                        <div id="my-group-members" class="flex gap-4 flex-wrap mb-6">
+                                            <!-- injected text -->
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card" style="background: var(--bg-hover);">
+                                        <h4 class="font-display mb-4">Post Project Update</h4>
+                                        <textarea id="update-msg" class="form-control mb-4" placeholder="What did the team accomplish today?" rows="4"></textarea>
+                                        <div class="flex justify-between gap-4">
+                                            <select id="update-status" class="form-control" style="width: 200px;">
+                                                <option value="Active">Mark as Active</option>
+                                                <option value="In Progress">Mark as In Progress</option>
+                                                <option value="Completed">Mark as Completed</option>
+                                            </select>
+                                            <button class="btn btn-primary" onclick="postGroupUpdate()">Post Progress</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex-col gap-6">
+                                    <div class="card" style="height: 100%;">
+                                        <h4 class="text-muted mb-6 text-sm uppercase font-bold" style="letter-spacing: 0.05em">Historical Project Log</h4>
+                                        <div id="my-group-updates" class="flex-col gap-4">
+                                            <!-- injected text -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Mentorship Tab -->
+            <section id="tab-mentorship" class="app-section">
+                <div class="dash-grid" id="mentorship-section">
+                    <div class="flex-col gap-6">
+                        <div class="card">
+                            <h2 class="mb-4 flex items-center gap-2 font-display text-2xl"><span class="text-secondary">●</span> Request Guidance</h2>
+                            
+                            <div id="request-form-container">
+                                <p class="text-muted mb-6" style="font-size: 1rem; line-height: 1.6;">Set a primary career milestone. Our matching engine will pair you with industry mentors that bridge your exact skill gaps.</p>
+                                <form id="mentorship-form" class="flex-col gap-4">
+                                    <div class="form-group mb-4">
+                                        <label class="form-label uppercase font-bold text-xs" style="letter-spacing:0.05em;">Target Role / Goal</label>
+                                        <select name="goal_role" id="goal_role_select" class="form-control" style="padding: 1rem;">
+                                            <option value="Web Developer">Web Developer</option>
+                                            <option value="Frontend Engineer">Frontend Engineer</option>
+                                            <option value="Backend Developer">Backend Developer</option>
+                                            <option value="Data Scientist">Data Scientist</option>
+                                            <option value="ML Engineer">ML Engineer</option>
+                                            <option value="DevOps Engineer">DevOps Engineer</option>
+                                        </select>
+                                    </div>
+                                    <button type="button" class="btn btn-secondary w-full" style="padding: 1rem; font-weight: bold; font-size: 1rem;" onclick="submitRequest()">DISCOVER CONNECTIONS</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-col gap-6">
+                        <div id="matches-list" style="display:none;">
+                            <div class="card" style="height: 100%;">
+                                <h3 class="font-display mb-6">AI Matched Mentors</h3>
+                                <div id="matches-container" class="flex-col gap-4">
+                                    <!-- Matches injected -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Discovery Tab -->
+            <section id="tab-discovery" class="app-section">
+                <div class="card mb-8">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="font-display text-3xl mb-2">Community Network</h2>
+                            <p class="text-muted" style="font-size: 1.1rem;">Discover active squads, skill matrices, and top peers ready to collaborate.</p>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <input type="text" class="form-control" placeholder="Search by tech stack..." style="width: 300px; padding: 0.8rem;">
+                            <select class="form-control" style="padding: 0.8rem;">
+                                <option value="all">All Disciplines</option>
+                                <option value="web">Web Development</option>
+                                <option value="ml">Machine Learning</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-grid">
+                    <div class="flex-col gap-6">
+                        <!-- Groups Grid -->
+                        <h3 class="font-display mb-4 text-xl">Active Cohorts</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;" id="groups-grid">
+                            <!-- Data injected via JS -->
+                             <p class="text-muted">Loading cohorts...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex-col gap-6">
+                        <!-- Discovery Grid -->
+                        <h3 class="font-display mb-4 text-xl">Available Peers</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;" id="discovery-grid">
+                            <!-- Data injected via JS -->
+                            <p class="text-muted">Loading peers...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+        </div>
+    </main>
+</div>
+
+<!-- Skill Detail Modal -->
+<div id="skill-modal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 1000; justify-content: center; align-items: center;">
+    <div class="card" style="width: 90%; max-width: 500px; position: relative;">
+        <button onclick="document.getElementById('skill-modal').style.display='none'" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+        <h3 id="modal-skill-name" class="font-display text-primary mb-2">Skill Name</h3>
+        
+        <div class="flex gap-4 mb-6">
+            <span id="modal-score" style="background: var(--bg-hover); padding: 0.3rem 0.8rem; border-radius: var(--radius-sm); font-weight: 600;">Score: 0</span>
+            <span id="modal-confidence" class="badge badge-primary">Confidence</span>
+        </div>
+        
+        <h4 class="text-muted mb-2" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Evidence</h4>
+        <ul id="modal-evidence" class="mb-6" style="padding-left: 1.5rem; font-size: 0.9rem; color: var(--text-muted);"></ul>
+        
+        <h4 class="text-muted mb-2" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Suggested Micro-Tasks</h4>
+        <div id="modal-improvements" class="flex-col gap-2"></div>
+    </div>
+</div>
+
+<script>
+    let radarChart = null;
+
+    // ----- UI NAVIGATION LOGIC -----
+    function switchTab(tabId, navElement) {
+        // Hide all sections
+        const sections = document.querySelectorAll('.app-section');
+        sections.forEach(s => s.classList.remove('active'));
+        
+        // Remove active state from all nav links
+        const navLinks = document.querySelectorAll('.sidebar .nav-link');
+        navLinks.forEach(n => n.classList.remove('active'));
+
+        // Show target section
+        document.getElementById(tabId).classList.add('active');
+        // Set new active nav link
+        if (navElement) {
+            navElement.classList.add('active');
+        }
+        
+        if (tabId === 'tab-discovery') {
+            fetchDiscoveryData();
+        }
+    }
+    
+    // Switch to Roadmap Tab explicitly automatically when generated
+    async function generateRoadmapAndSwitch() {
+        await generateRoadmap();
+        document.querySelector('#nav-roadmap').click();
+    }
+    // -------------------------------
+    // ---------------- COLLABORATION / GROUPS -------------
+    let currentGroupId = null;
+    
+    // Automatically fetch groups on load
+    document.addEventListener("DOMContentLoaded", fetchMyGroup);
+    
+    async function fetchMyGroup() {
+        const res = await fetch('/get_groups');
+        const data = await res.json();
+        
+        let myGroup = null;
+        // Assuming session username or ID, let's just find the first group where the user is a member
+        // In reality, we need to know the logged in user's ID, but we can do a naive check via the members list
+        // Let's modify the backend to return user's ID? Actually, another way is /get_my_group.
+        // For standard demonstration, if the user created it, or if they joined. Let's just find any group where they are a member if we have their name. Actually, we don't have session.user_id in standard JS.
+        // I will just display the first group for logic's sake if they create one, or we can look for their name: "{{ session.name }}"
+        const myName = "{{ session.name }}";
+
+        for (let g of data.groups) {
+            if (g.members.some(m => m.name === myName)) {
+                myGroup = g;
+                break;
+            }
+        }
+        
+        if (myGroup) {
+            currentGroupId = myGroup.id;
+            document.getElementById('no-group-view').style.display = 'none';
+            document.getElementById('active-group-view').style.display = 'block';
+            
+            document.getElementById('my-group-name').innerText = myGroup.name;
+            document.getElementById('my-group-project').innerText = "Project: " + myGroup.project_title;
+            document.getElementById('my-group-status').innerText = myGroup.status;
+            
+            const membersHtml = myGroup.members.map(m => `<span class="badge" style="background:var(--bg-main); border:1px solid var(--border); color:var(--text-muted);">${m.name}</span>`).join('');
+            document.getElementById('my-group-members').innerHTML = membersHtml;
+            
+            const updatesHtml = myGroup.updates.map(u => `
+                <div class="card p-3" style="background:var(--bg-main);">
+                    <div class="text-sm text-muted mb-1">${u.timestamp}</div>
+                    <div style="font-size:0.9rem;">${u.message}</div>
+                </div>
+            `).join('') || '<p class="text-sm text-muted">No updates yet.</p>';
+            
+            document.getElementById('my-group-updates').innerHTML = updatesHtml;
+        } else {
+            document.getElementById('no-group-view').style.display = 'block';
+            document.getElementById('active-group-view').style.display = 'none';
+        }
+    }
+    
+    async function createGroup() {
+        const formData = new FormData(document.getElementById('create-group-form'));
+        const res = await fetch('/create_group', { method: 'POST', body: formData });
+        const data = await res.json();
+        
+        if (data.success) {
+            await fetchMyGroup();
+        }
+    }
+    
+    async function postGroupUpdate() {
+        if (!currentGroupId) return;
+        
+        const fd = new FormData();
+        fd.append('group_id', currentGroupId);
+        fd.append('message', document.getElementById('update-msg').value);
+        fd.append('status', document.getElementById('update-status').value);
+        
+        const res = await fetch('/update_project_status', { method: 'POST', body: fd });
+        if(res.ok) {
+            document.getElementById('update-msg').value = '';
+            await fetchMyGroup();
+        }
+    }
+
+    async function runAnalysis() {
+        const formData = new FormData();
+        formData.append('github_user', document.getElementById('github_input').value);
+        if(document.getElementById('resume_input').files[0]) {
+            formData.append('resume', document.getElementById('resume_input').files[0]);
+        }
+
+        const btn = event.target;
+        btn.innerText = "SCANNING...";
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/analyze_profile', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (res.ok) {
+                await updateRadar();
+                document.getElementById('radar-section').style.display = 'flex';
+                document.getElementById('radar-details').style.display = 'flex';
+            }
+        } catch (e) {
+            alert("Error during scan");
+        } finally {
+            btn.innerText = "RUN RADAR SCAN";
+            btn.disabled = false;
+        }
+    }
+
+    async function updateRadar() {
+        const goal = document.getElementById('goal_role_select').value;
+        const res = await fetch(`/get_analysis?goal=${goal}`);
+        const data = await res.json();
+        
+        if (data.error) return;
+
+        document.getElementById('match-pct').innerText = data.match_percentage + "%";
+        document.getElementById('goal-title').innerText = goal;
+
+        // Render Next Best Action
+        const winsSection = document.getElementById('quick-wins');
+        if (data.next_action) {
+            winsSection.style.display = 'block';
+            document.getElementById('next-action-task').innerText = data.next_action.task;
+            document.getElementById('next-action-time').innerText = "⏱ " + data.next_action.time;
+            document.getElementById('next-action-impact').innerText = data.next_action.impact;
+        } else {
+            winsSection.style.display = 'none';
+        }
+
+        // Radar chart
+        const allSkills = [...data.strong, ...data.moderate, ...data.missing];
+        const mappedSkills = allSkills.map(s => typeof s === 'string' ? {name: s} : s);
+        const labels = mappedSkills.map(s => s.name);
+        const values = mappedSkills.map(s => s.score || 0);
+
+        if (radarChart) radarChart.destroy();
+        
+        const ctx = document.getElementById('skillRadar').getContext('2d');
+        const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#3B82F6';
+        const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-light').trim() || 'rgba(59, 130, 246, 0.15)';
+        const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || '#262626';
+
+        radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Proficiency',
+                    data: values,
+                    fill: true,
+                    backgroundColor: bgColor,
+                    borderColor: borderColor,
+                    pointBackgroundColor: borderColor,
+                    pointBorderColor: '#fff',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const index = elements[0].index;
+                        showSkillModal(mappedSkills[index]);
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: { color: gridColor },
+                        grid: { color: gridColor },
+                        pointLabels: { color: '#94a3b8', font: {size: 11, family: 'Inter'} },
+                        ticks: { display: false, max: 100, min: 0 }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // Skill List
+        const list = document.getElementById('skills-list');
+        list.innerHTML = '';
+        
+        const addSkill = (skill, type) => {
+            const name = typeof skill === 'string' ? skill : skill.name;
+            const conf = (skill.confidence || '').toUpperCase();
+            
+            let badgeClass = 'badge-error';
+            if(type === 'strong') badgeClass = 'badge-success';
+            if(type === 'moderate') badgeClass = 'badge-warning';
+
+            const badge = `<span class="badge ${badgeClass}">${type === 'missing' ? 'GAP' : conf}</span>`;
+            
+            list.innerHTML += `
+                <div style="padding: 0.8rem; background: var(--bg-hover); border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer;" onclick='showSkillModal(${JSON.stringify(skill).replace(/'/g, "&#39;")})'>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight: 500; font-size: 0.9rem;">${name}</span>
+                        ${badge}
+                    </div>
+                </div>
+            `;
+        }
+
+        data.strong.forEach(s => addSkill(s, 'strong'));
+        data.moderate.forEach(s => addSkill(s, 'moderate'));
+        data.missing.forEach(s => addSkill(s, 'missing'));
+        
+        // Auto request mentorship on analysis finish
+        submitRequest();
+    }
+
+    function showSkillModal(skill) {
+        if (typeof skill === 'string') skill = {name: skill, score: 0, confidence: "Low", evidence: [], improvements: []};
+        
+        document.getElementById('modal-skill-name').innerText = skill.name;
+        document.getElementById('modal-score').innerText = "Score: " + (skill.score || 0) + "%";
+        document.getElementById('modal-confidence').innerText = (skill.confidence || "Low") + " Confidence";
+        
+        const evList = document.getElementById('modal-evidence');
+        evList.innerHTML = (skill.evidence || []).map(e => `<li>${e}</li>`).join('') || "<li>No evidence found</li>";
+        
+        const impList = document.getElementById('modal-improvements');
+        if (skill.improvements && skill.improvements.length > 0) {
+            impList.innerHTML = skill.improvements.map(i => `
+                <div style="background: var(--bg-hover); padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                    <div style="font-weight:500; font-size:0.9rem; margin-bottom: 0.3rem">${i.task}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">⏱ ${i.time} &nbsp;&nbsp; <span style="color:var(--success)">🚀 +${i.impact}%</span></div>
+                </div>
+            `).join('');
+        } else {
+            impList.innerHTML = '<p class="text-muted" style="font-size:0.9rem">No specific micro-tasks available.</p>';
+        }
+        
+        document.getElementById('skill-modal').style.display = 'flex';
+    }
+
+    async function generateRoadmap() {
+        const formData = new FormData();
+        formData.append('goal_role', document.getElementById('goal_role_select').value);
+        
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "GENERATING ROADMAP...";
+        
+        const res = await fetch('/generate-roadmap', { method: 'POST', body: formData });
+        
+        btn.innerText = originalText;
+        
+        await fetchAndRenderRoadmap();
+    }
+    
+    async function fetchAndRenderRoadmap() {
+        const res = await fetch('/get-roadmap');
+        const data = await res.json();
+        
+        if (data.error) return;
+        
+        const container = document.getElementById('roadmap-container');
+        container.innerHTML = '';
+        container.style.textAlign = 'left';
+        container.style.padding = '0';
+        
+        let roadHtml = '<div style="border-left: 2px solid var(--border); margin-left: 1rem; padding-left: 2rem;" class="flex-col gap-8">';
+        
+        for (const [phase, steps] of Object.entries(data.phases)) {
+
+            roadHtml += `
+                <div style="position: relative;">
+                    <div style="position: absolute; left: -2.6rem; top: 0; width: 1rem; height: 1rem; border-radius: 50%; background: var(--secondary); border: 4px solid var(--bg-card);"></div>
+                    <h3 class="font-display mb-6" style="color: var(--secondary); font-size: 1.5rem;">${phase}</h3>
+                    <div class="dash-grid">
+            `;
+            
+            steps.forEach(s => {
+                const icon = s.status === 'completed' ? '✅' : '⏳';
+                const opacity = s.status === 'completed' ? '0.5' : '1';
+                const textDec = s.status === 'completed' ? 'line-through' : 'none';
+                
+                roadHtml += `
+                    <div style="background: var(--bg-hover); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.5rem; transition: transform 0.2s; opacity: ${opacity};" class="hover:shadow-md">
+                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                            <div style="font-size: 1.5rem; cursor: pointer;" onclick="updateStep(${s.id}, '${s.status === 'completed' ? 'pending' : 'completed'}')">${icon}</div>
+                            <div>
+                                <h4 style="font-weight: 600; font-size: 1.1rem; text-decoration: ${textDec}; mb-2">${s.title}</h4>
+                                <div class="text-muted mt-2 mb-4" style="font-size: 0.95rem; line-height: 1.5;">${s.description}</div>
+                                <div><span class="badge badge-primary">${s.resources}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            roadHtml += `</div></div>`;
+        }
+        
+        roadHtml += '</div>';
+        container.innerHTML = roadHtml;
+    }
+    
+    async function updateStep(stepId, newStatus) {
+        const fd = new FormData();
+        fd.append('step_id', stepId);
+        fd.append('status', newStatus);
+        await fetch('/update-progress', {method: 'POST', body: fd});
+        fetchAndRenderRoadmap();
+    }
+
+    async function submitRequest() {
+        const formData = new FormData(document.getElementById('mentorship-form'));
+        await fetch('/request_mentorship', { method: 'POST', body: formData });
+        
+        document.getElementById('request-form-container').style.display = 'none';
+        document.getElementById('matches-list').style.display = 'block';
+        
+        const res = await fetch('/get_matches');
+        const data = await res.json();
+        
+        const container = document.getElementById('matches-container');
+        container.innerHTML = '';
+        data.matches.forEach(m => {
+            container.innerHTML += `
+                <div style="padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; background: var(--bg-hover);">
+                    <div style="flex:1">
+                        <div style="font-weight:600;">${m.name}</div>
+                        <div class="text-secondary" style="font-size:0.8rem; font-weight:600; margin-bottom: 2px;">${m.reason}</div>
+                        <div class="text-muted" style="font-size:0.8rem;">${m.bio || 'Professional Mentor'}</div>
+                    </div>
+                    <div class="flex-col items-center gap-2">
+                        <div class="font-display text-primary" style="font-size: 1.2rem;">${m.match_score}%</div>
+                        <button class="btn btn-secondary" style="font-size:0.75rem; padding:0.4rem 0.6rem;">Connect</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    // ---------------- DISCOVERY ----------------
+    async function fetchDiscoveryData() {
+        const [studRes, grpRes] = await Promise.all([
+            fetch('/get_students'),
+            fetch('/get_groups')
+        ]);
+        
+        const studData = await studRes.json();
+        const grpData = await grpRes.json();
+
+        renderStudents(studData.students || []);
+        renderGroups(grpData.groups || []);
+    }
+
+    function renderStudents(students) {
+        const grid = document.getElementById('discovery-grid');
+        grid.innerHTML = '';
+        
+        if(students.length === 0) {
+            grid.innerHTML = '<div class="card w-full text-center p-8"><p class="text-muted text-lg">No peers available right now.</p></div>';
+            return;
+        }
+
+        students.forEach(st => {
+            const availColor = st.availability === 'Available' ? 'var(--success)' : 'var(--warning)';
+            
+            grid.innerHTML += `
+                <div class="card hover:shadow-md" style="display:flex; flex-direction:column; justify-content:space-between; transition: transform 0.2s;">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="feed-icon" style="background: var(--primary); color: white; width: 44px; height: 44px; font-size: 1.2rem; font-weight: bold;">
+                                ${st.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div style="flex: 1;">
+                                <h3 class="font-display text-main" style="font-size: 1.2rem;">${st.name}</h3>
+                                <div class="text-xs" style="color: ${availColor}; font-weight: 600; border: 1px solid ${availColor}; padding: 0.1rem 0.5rem; border-radius: 4px; display: inline-block; margin-top: 5px;">
+                                    ${st.availability}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted text-sm mb-6" style="line-height: 1.6;">${st.bio || 'Driven learner actively expanding their technical horizon. Open to building side projects.'}</p>
+                    </div>
+                    
+                    <button class="btn btn-secondary w-full" style="font-size: 0.9rem; padding: 0.6rem;">Invite to Collaborate</button>
+                </div>
+            `;
+        });
+    }
+
+    function renderGroups(groups) {
+        const grid = document.getElementById('groups-grid');
+        grid.innerHTML = '';
+        
+        if(groups.length === 0) {
+            grid.innerHTML = '<div class="card w-full text-center p-8"><p class="text-muted text-lg">No cohorts actively assembling.</p></div>';
+            return;
+        }
+
+        groups.forEach(g => {
+            let statusColor = 'var(--primary)';
+            if(g.status === 'Completed') statusColor = 'var(--success)';
+            
+            const members = g.members.map(m => `<span class="badge" style="background: var(--bg-main); border: 1px solid var(--border);">${m.name}</span>`).join(' ') || 'None';
+
+            grid.innerHTML += `
+                <div class="card hover:shadow-md" style="background: var(--bg-hover); display:flex; flex-direction:column; justify-content:space-between; transition: transform 0.2s;">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-display text-main" style="font-size: 1.3rem; margin-bottom: 0.3rem;">${g.name}</h3>
+                                <div class="text-primary font-bold" style="font-size: 0.9rem;">${g.project_title}</div>
+                            </div>
+                            <div class="badge badge-primary" style="background: ${statusColor}20; color: ${statusColor}; padding: 0.3rem 0.6rem;">
+                                ${g.status}
+                            </div>
+                        </div>
+                        
+                        <p class="text-muted text-sm mb-4" style="min-height: 3rem; line-height: 1.6;">${g.description || 'No description provided.'}</p>
+                        
+                        <div class="mb-6">
+                            <strong style="text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">SQUAD:</strong>
+                            <div class="flex gap-2 flex-wrap">${members}</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary w-full" style="font-size: 0.9rem; padding: 0.6rem;" onclick="requestJoin(${g.id})">Request to Join</button>
+                </div>
+            `;
+        });
+    }
+
+    async function requestJoin(groupId) {
+        const fd = new FormData();
+        fd.append('group_id', groupId);
+        const res = await fetch('/join_group', {method: 'POST', body: fd});
+        const data = await res.json();
+        
+        if(data.success) {
+            alert('Successfully joined the group!');
+            fetchDiscoveryData();
+        } else {
+            alert('Failed to join or you are already a member.');
+        }
+    }
+</script>
+{% endblock %}

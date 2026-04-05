@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Mentor - Skill Gap Radar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0A1F44 0%, #1A1A1A 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #FFFFFF;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF 0%, #B8C6DB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+        
+        .back-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+        
+        .back-link:hover {
+            color: #B8C6DB;
+            text-decoration: underline;
+        }
+        
+        .info-box {
+            background: rgba(10, 31, 68, 0.3);
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 3px solid #0A1F44;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-box p {
+            color: #B8C6DB;
+            font-size: 14px;
+            line-height: 1.6;
+            letter-spacing: 0.3px;
+        }
+        
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+        
+        .slot-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .slot-card:hover:not(.full) {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .slot-card.full {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .slot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 18px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .teacher-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFFFFF;
+            letter-spacing: -0.5px;
+        }
+        
+        .mode-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #0A1F44 0%, #36454F 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.5px;
+        }
+        
+        .mode-badge.offline {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+        }
+        
+        .slot-time {
+            margin: 18px 0;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .time-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        
+        .time-label {
+            color: #B8C6DB;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .time-value {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        
+        .capacity-info {
+            margin: 18px 0;
+            padding: 14px;
+            background: rgba(10, 31, 68, 0.3);
+            border-radius: 8px;
+            border-left: 3px solid #0A1F44;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .capacity-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .capacity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0A1F44, #36454F);
+            transition: width 0.3s;
+        }
+        
+        .capacity-text {
+            font-size: 12px;
+            color: #B8C6DB;
+            margin-top: 8px;
+            letter-spacing: 0.3px;
+        }
+        
+        .capacity-full {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+        
+        .book-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #0A1F44 0%, #36454F 100%);
+            color: white;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+        
+        .book-btn:hover {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+        
+        .book-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        
+        .empty-state p {
+            color: #B8C6DB;
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1A2B4A 0%, #0F1820 100%);
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-header h2 {
+            font-size: 20px;
+            color: #FFFFFF;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #B8C6DB;
+            transition: all 0.3s;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        
+        .close-btn:hover {
+            color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-details {
+            margin: 25px 0;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 12px 0;
+            font-size: 14px;
+        }
+        
+        .detail-label {
+            color: #B8C6DB;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .detail-value {
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        .btn-cancel {
+            flex: 1;
+            padding: 13px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-confirm {
+            flex: 1;
+            padding: 13px;
+            background: linear-gradient(135deg, #2ED573 0%, #27a952 100%);
+            color: #FFFFFF;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 213, 115, 0.3);
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 3px solid;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+        
+        .alert-success {
+            background: rgba(46, 213, 115, 0.1);
+            color: #2ED573;
+            border-color: #2ED573;
+        }
+        
+        .alert-error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #FF6B6B;
+            border-color: #FF6B6B;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #B8C6DB;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #0A1F44;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .slots-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📅 Book a Mentor</h1>
+        <a href="/" class="back-link">← Back to Home</a>
+    </div>
+    
+    <div class="info-box">
+        <p>🎯 Select a mentor and available time slot to request mentorship for your group. Teachers will review your request and confirm the booking.</p>
+    </div>
+    
+    <div id="alertContainer"></div>
+    
+    <div id="slotsContainer" class="loading">
+        <div class="spinner"></div>
+        <p>Loading available mentor slots...</p>
+    </div>
+    
+    <div id="emptyState" style="display: none;" class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>No mentor slots available at the moment.</p>
+        <p style="font-size: 13px; color: #95a5a6;">Check back soon or ask your teachers to create availability slots.</p>
+    </div>
+</div>
+
+<!-- Booking Confirmation Modal -->
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Confirm Booking Request</h2>
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        
+        <div class="modal-details">
+            <div class="detail-row">
+                <span class="detail-label">Teacher:</span>
+                <span class="detail-value" id="modalTeacher">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Day:</span>
+                <span class="detail-value" id="modalDay">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Time:</span>
+                <span class="detail-value" id="modalTime">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Mode:</span>
+                <span class="detail-value" id="modalMode">-</span>
+            </div>
+        </div>
+        
+        <p style="font-size: 13px; color: #7f8c8d; margin-bottom: 20px;">
+            Your group will be paired with this mentor at the selected time. The mentor will review and confirm your request.
+        </p>
+        
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitBooking()">Send Request</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedSlotId = null;
+
+// Load slots on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadSlots();
+});
+
+function loadSlots() {
+    fetch('/view_mentor_slots')
+        .then(r => r.json())
+        .then(data => {
+            let container = document.getElementById('slotsContainer');
+            let empty = document.getElementById('emptyState');
+            
+            if (data.success && data.slots.length > 0) {
+                container.innerHTML = '';
+                container.className = 'slots-grid';
+                
+                data.slots.forEach(slot => {
+                    let availablePercent = (slot.booked / slot.capacity) * 100;
+                    let isAvailable = slot.available;
+                    
+                    let html = `
+                        <div class="slot-card">
+                            <div class="slot-header">
+                                <span class="teacher-name">${escapeHtml(slot.teacher)}</span>
+                                <span class="mode-badge ${slot.mode === 'online' ? '' : 'offline'}">
+                                    ${slot.mode === 'online' ? '💻 Online' : '🏢 Offline'}
+                                </span>
+                            </div>
+                            
+                            <div class="slot-time">
+                                <div class="time-row">
+                                    <span class="time-label">📅 Day</span>
+                                    <span class="time-value">${escapeHtml(slot.day)}</span>
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-label">⏰ Time</span>
+                                    <span class="time-value">${slot.start_time} - ${slot.end_time}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="capacity-info">
+                                <div class="time-row">
+                                    <span class="time-label">Capacity</span>
+                                    <span class="time-value">${slot.booked}/${slot.capacity}</span>
+                                </div>
+                                <div class="capacity-bar">
+                                    <div class="capacity-fill" style="width: ${availablePercent}%"></div>
+                                </div>
+                                <div class="capacity-text">
+                                    ${isAvailable ? slot.capacity - slot.booked + ' slot' + (slot.capacity - slot.booked !== 1 ? 's' : '') + ' available' : '<span class="capacity-full">FULL</span>'}
+                                </div>
+                            </div>
+                            
+                            <button class="book-btn" 
+                                    ${isAvailable ? `onclick="openConfirmModal(${slot.id}, '${slot.teacher}', '${slot.day}', '${slot.start_time}', '${slot.end_time}', '${slot.mode}')"` : 'disabled'}>
+                                ${isAvailable ? '✓ Request Slot' : '✗ Slot Full'}
+                            </button>
+                        </div>
+                    `;
+                    container.innerHTML += html;
+                });
+                empty.style.display = 'none';
+            } else {
+                container.style.display = 'none';
+                empty.style.display = 'block';
+            }
+        })
+        .catch(err => {
+            showAlert('Error loading slots: ' + err.message, 'error');
+            console.error(err);
+        });
+}
+
+function openConfirmModal(slotId, teacher, day, startTime, endTime, mode) {
+    selectedSlotId = slotId;
+    document.getElementById('modalTeacher').textContent = teacher;
+    document.getElementById('modalDay').textContent = day;
+    document.getElementById('modalTime').textContent = startTime + ' - ' + endTime;
+    document.getElementById('modalMode').textContent = mode === 'online' ? '💻 Online' : '🏢 Offline';
+    document.getElementById('confirmModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('confirmModal').classList.remove('active');
+    selectedSlotId = null;
+}
+
+function submitBooking() {
+    if (!selectedSlotId) return;
+    
+    let btn = event.target;
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    
+    let formData = new FormData();
+    formData.append('slot_id', selectedSlotId);
+    
+    fetch('/request_mentor_slot', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        closeModal();
+        if (data.success) {
+            showAlert('✓ Request sent! Your teacher will review and confirm.', 'success');
+            setTimeout(() => {
+                loadSlots();
+            }, 1500);
+        } else {
+            showAlert('Error: ' + data.error, 'error');
+        }
+        btn.disabled = false;
+        btn.textContent = '✓ Request Slot';
+    })
+    .catch(err => {
+        showAlert('Error: ' + err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '✓ Request Slot';
+    });
+}
+
+function showAlert(message, type) {
+    let container = document.getElementById('alertContainer');
+    let alert = document.createElement('div');
+    alert.className = 'alert alert-' + type;
+    alert.textContent = message;
+    container.innerHTML = '';
+    container.appendChild(alert);
+    
+    setTimeout(() => {
+        alert.remove();
+    }, 5000);
+}
+
+function escapeHtml(text) {
+    let map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// Close modal when clicking outside
+document.getElementById('confirmModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit SDP Proposal - Skill Gap Radar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0A1F44 0%, #1A1A1A 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #FFFFFF;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF 0%, #B8C6DB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+        
+        .back-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+            font-size: 14px;
+        }
+        
+        .back-link:hover {
+            color: #B8C6DB;
+            text-decoration: underline;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+            border: 1px solid #FFC107;
+        }
+        
+        .status-approved {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ED573;
+            border: 1px solid #2ED573;
+        }
+        
+        .status-rejected {
+            background: rgba(255, 107, 107, 0.2);
+            color: #FF6B6B;
+            border: 1px solid #FF6B6B;
+        }
+        
+        .current-proposal {
+            background: rgba(10, 31, 68, 0.3);
+            padding: 24px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 3px solid #0A1F44;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .current-proposal h3 {
+            color: #FFFFFF;
+            margin-bottom: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .proposal-field {
+            margin-bottom: 16px;
+        }
+        
+        .proposal-field label {
+            font-weight: 600;
+            color: #B8C6DB;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 7px;
+            letter-spacing: 0.3px;
+        }
+        
+        .proposal-field p {
+            color: #FFFFFF;
+            line-height: 1.6;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            letter-spacing: 0.3px;
+        }
+        
+        .teacher-comment {
+            background: rgba(255, 193, 7, 0.1);
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 3px solid #FFC107;
+            margin-top: 12px;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+        
+        .teacher-comment strong {
+            color: #FFC107;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .teacher-comment p {
+            color: #B8C6DB;
+            line-height: 1.6;
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            padding: 13px 16px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.08);
+            color: #FFFFFF;
+        }
+        
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(10, 31, 68, 0.2);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #B8C6DB;
+            margin-top: 4px;
+            letter-spacing: 0.2px;
+        }
+        
+        .form-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            padding: 13px 20px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0A1F44 0%, #36454F 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1A3A5C 0%, #4A5F6F 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(10, 31, 68, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 3px solid;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+        
+        .alert-success {
+            background: rgba(46, 213, 115, 0.1);
+            color: #2ED573;
+            border-color: #2ED573;
+        }
+        
+        .alert-error {
+            background: rgba(255, 107, 107, 0.1);
+            color: #FF6B6B;
+            border-color: #FF6B6B;
+        }
+        
+        .alert-info {
+            background: rgba(10, 31, 68, 0.3);
+            color: #FFFFFF;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .info-box {
+            background: rgba(10, 31, 68, 0.3);
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 3px solid #0A1F44;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-box p {
+            color: #B8C6DB;
+            font-size: 14px;
+            line-height: 1.6;
+            letter-spacing: 0.3px;
+        }
+        
+        .info-box strong {
+            color: #FFFFFF;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #B8C6DB;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #0A1F44;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .form-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📋 Software Development Proposal</h1>
+        <a href="/" class="back-link">← Back to Dashboard</a>
+    </div>
+    
+    <div class="card">
+        <div class="info-box">
+            <p>✨ <strong>Submit your group's Software Development Project proposal for teacher approval.</strong> This proposal outlines your project idea, technology stack, and timeline. Once approved, your group can begin active development.</p>
+        </div>
+        
+        <div id="alertContainer"></div>
+        
+        <!-- Current Proposal Display -->
+        <div id="proposalDisplay" class="current-proposal" style="display:none;">
+            <h3>📌 Current Proposal</h3>
+            <div class="proposal-field">
+                <label>Project Title</label>
+                <p id="currentTitle"></p>
+            </div>
+            <div class="proposal-field">
+                <label>Description</label>
+                <p id="currentDescription"></p>
+            </div>
+            <div class="proposal-field">
+                <label>Technology Stack</label>
+                <p id="currentTechStack"></p>
+            </div>
+            <div class="proposal-field">
+                <label>Timeline</label>
+                <p id="currentTimeline"></p>
+            </div>
+            <div class="proposal-field">
+                <label>Status</label>
+                <p>
+                    <span id="statusBadge" class="status-badge"></span>
+                </p>
+            </div>
+            <div id="teacherCommentBox" style="display:none;">
+                <div class="teacher-comment">
+                    <strong>👨‍🏫 Teacher's Feedback:</strong>
+                    <p id="teacherComment"></p>
+                </div>
+            </div>
+        </div>
+        
+        <h2 style="margin-bottom: 20px; color: #2c3e50;">✏️ Submit/Update Proposal</h2>
+        
+        <form onsubmit="submitProposal(event)">
+            <div class="form-group">
+                <label for="title">Project Title *</label>
+                <input type="text" id="title" name="title" required placeholder="e.g., AI-Powered Resume Analyzer">
+                <span class="help-text">Clear, concise project name</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Project Description *</label>
+                <textarea id="description" name="description" required placeholder="Describe your project idea, objectives, and key features..."></textarea>
+                <span class="help-text">Provide a comprehensive overview of what your project will do</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="tech_stack">Technology Stack *</label>
+                <textarea id="tech_stack" name="tech_stack" required placeholder="e.g., React, Node.js, MongoDB, Python, Machine Learning Libraries..."></textarea>
+                <span class="help-text">List all technologies, frameworks, and tools you'll use</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="timeline">Project Timeline *</label>
+                <textarea id="timeline" name="timeline" required placeholder="e.g., Week 1-2: Setup & Planning, Week 3-5: Frontend Development, Week 6-8: Backend & Integration, Week 9-10: Testing & Deployment..."></textarea>
+                <span class="help-text">Break down your project into phases and weeks</span>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="submitBtn">✓ Submit Proposal</button>
+                <button type="button" class="btn btn-secondary" onclick="loadCurrentProposal()">🔄 Refresh Status</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Load current proposal on page load
+document.addEventListener('DOMContentLoaded', loadCurrentProposal);
+
+function loadCurrentProposal() {
+    fetch('/view_proposal')
+        .then(r => r.json())
+        .then(data => {
+            if (data.proposal) {
+                const p = data.proposal;
+                
+                // Show current proposal
+                document.getElementById('proposalDisplay').style.display = 'block';
+                document.getElementById('currentTitle').textContent = p.title;
+                document.getElementById('currentDescription').textContent = p.description;
+                document.getElementById('currentTechStack').textContent = p.tech_stack;
+                document.getElementById('currentTimeline').textContent = p.timeline;
+                
+                // Set status badge
+                const badge = document.getElementById('statusBadge');
+                badge.classList.remove('status-pending', 'status-approved', 'status-rejected');
+                badge.classList.add('status-' + p.status);
+                badge.textContent = p.status.charAt(0).toUpperCase() + p.status.slice(1);
+                
+                // Show teacher comment if exists
+                if (p.teacher_comment && (p.status === 'rejected' || p.status === 'approved')) {
+                    document.getElementById('teacherCommentBox').style.display = 'block';
+                    document.getElementById('teacherComment').textContent = p.teacher_comment;
+                }
+                
+                // Pre-fill form if proposal can be edited
+                if (p.status === 'pending' || p.status === 'rejected') {
+                    document.getElementById('title').value = p.title;
+                    document.getElementById('description').value = p.description;
+                    document.getElementById('tech_stack').value = p.tech_stack;
+                    document.getElementById('timeline').value = p.timeline;
+                }
+            }
+        })
+        .catch(err => {
+            console.error('Error loading proposal:', err);
+        });
+}
+
+function submitProposal(event) {
+    event.preventDefault();
+    
+    const title = document.getElementById('title').value.trim();
+    const description = document.getElementById('description').value.trim();
+    const tech_stack = document.getElementById('tech_stack').value.trim();
+    const timeline = document.getElementById('timeline').value.trim();
+    
+    if (!title || !description || !tech_stack || !timeline) {
+        showAlert('⚠️ Please fill out all required fields', 'error');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('tech_stack', tech_stack);
+    formData.append('timeline', timeline);
+    
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+    
+    fetch('/submit_proposal', {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('✓ Proposal submitted successfully! Waiting for teacher review...', 'success');
+            setTimeout(() => {
+                loadCurrentProposal();
+            }, 1000);
+        } else {
+            showAlert('❌ Error: ' + (data.error || 'Failed to submit proposal'), 'error');
+        }
+        btn.disabled = false;
+        btn.textContent = '✓ Submit Proposal';
+    })
+    .catch(err => {
+        showAlert('❌ Error: ' + err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '✓ Submit Proposal';
+    });
+}
+
+function showAlert(message, type) {
+    const container = document.getElementById('alertContainer');
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-' + type;
+    alert.textContent = message;
+    container.innerHTML = '';
+    container.appendChild(alert);
+    
+    if (type !== 'success') {
+        setTimeout(() => {
+            alert.style.opacity = '0.8';
+        }, 3000);
+    }
+}
+</script>
+
+</body>
+</html>

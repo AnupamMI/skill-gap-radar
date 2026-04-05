@@ -10,59 +10,63 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0A1F44 0%, #1A1A1A 100%);
             height: 100vh;
             display: flex;
             flex-direction: column;
-            color: #2c3e50;
+            color: #FFFFFF;
         }
         
         .chat-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background: white;
+            background: rgba(255, 255, 255, 0.02);
         }
         
         .back-nav {
             padding: 15px 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #ecf0f1;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
         }
         
         .back-nav a {
-            color: #3498db;
+            color: #FFFFFF;
             text-decoration: none;
             font-weight: 600;
-            transition: color 0.3s;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
         }
         
         .back-nav a:hover {
-            color: #2980b9;
+            color: #B8C6DB;
+            text-decoration: underline;
         }
         
         .chat-header {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            background: linear-gradient(135deg, #0A1F44 0%, #36454F 100%);
             color: white;
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .header-info h2 {
             font-size: 18px;
             margin-bottom: 5px;
-            font-weight: 600;
+            font-weight: 700;
         }
         
         .header-info p {
             font-size: 13px;
-            opacity: 0.9;
+            color: #B8C6DB;
+            letter-spacing: 0.3px;
         }
         
         .header-icons a {
@@ -83,7 +87,7 @@
             flex: 1;
             padding: 20px;
             overflow-y: auto;
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.02);
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -114,25 +118,28 @@
             padding: 12px 16px;
             border-radius: 18px;
             word-wrap: break-word;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
         
         .message.sent .message-bubble {
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            background: linear-gradient(135deg, #2ED573 0%, #27a952 100%);
             color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .message.received .message-bubble {
-            background: white;
-            color: #2c3e50;
-            border: 1px solid #ecf0f1;
+            background: rgba(255, 255, 255, 0.08);
+            color: #FFFFFF;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
         
         .message-meta {
             font-size: 12px;
-            color: #95a5a6;
+            color: #B8C6DB;
             margin-top: 6px;
             padding: 0 10px;
+            letter-spacing: 0.2px;
         }
         
         .message.received .message-meta {
@@ -145,28 +152,56 @@
         
         .sender-name {
             font-size: 12px;
-            font-weight: 600;
-            color: #3498db;
+            font-weight: 700;
+            color: #B8C6DB;
             padding: 0 10px;
             margin-bottom: 5px;
+            letter-spacing: 0.3px;
         }
         
         .file-preview {
-            margin-top: 8px;
-            padding: 8px;
-            background: rgba(0,0,0,0.05);
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 13px;
+            border-left: 3px solid #0A1F44;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .file-link {
+            color: #B8C6DB;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            word-break: break-word;
+        }
+        
+        .file-link:hover {
+            color: #FFFFFF;
+            text-decoration: underline;
+        }
+        
+        .message.sent .file-link {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .message.received .file-link {
+            color: #B8C6DB;
         }
         
         .input-area {
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
             padding: 15px 20px;
-            border-top: 1px solid #ecf0f1;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             gap: 12px;
             align-items: flex-end;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
         }
         
         .input-actions {
@@ -177,7 +212,7 @@
         .action-btn {
             background: none;
             border: none;
-            color: #3498db;
+            color: #B8C6DB;
             font-size: 22px;
             cursor: pointer;
             padding: 5px;
@@ -185,34 +220,41 @@
         }
         
         .action-btn:hover {
-            color: #2980b9;
+            color: #FFFFFF;
             transform: scale(1.1);
         }
         
         #messageInput {
             flex: 1;
             padding: 12px 15px;
-            border: 1px solid #ecf0f1;
-            border-radius: 20px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
             font-family: inherit;
             font-size: 14px;
             resize: none;
             max-height: 100px;
             transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.08);
+            color: #FFFFFF;
+        }
+        
+        #messageInput::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
         
         #messageInput:focus {
             outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(10, 31, 68, 0.2);
         }
         
         .send-btn {
-            background: #3498db;
-            border: none;
+            background: linear-gradient(135deg, #2ED573 0%, #27a952 100%);
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
             color: white;
             padding: 10px;
-            border-radius: 50%;
+            border-radius: 10px;
             width: 40px;
             height: 40px;
             cursor: pointer;
@@ -224,8 +266,9 @@
         }
         
         .send-btn:hover {
-            background: #2980b9;
+            background: linear-gradient(135deg, #27a952 0%, #1fa03f 100%);
             transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3);
         }
         
         #fileInput {
@@ -235,10 +278,11 @@
         .online-dot {
             width: 8px;
             height: 8px;
-            background: #27ae60;
+            background: #2ED573;
             border-radius: 50%;
             display: inline-block;
             margin-left: 8px;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3);
         }
         
         @media (max-width: 768px) {
@@ -298,6 +342,8 @@
 <script>
 let cid = {{ cid }};
 let userId = {{ session.user_id }};
+let loadedMessageCount = 0;
+let isFirstLoad = true;
 
 // Auto-resize textarea
 document.getElementById('messageInput').addEventListener('input', function() {
@@ -316,7 +362,7 @@ document.getElementById('messageInput').addEventListener('keypress', function(e)
 // Load messages initially
 loadMessages();
 
-// Load messages every 2 seconds for live updates
+// Load messages every 2 seconds for live updates (only append new ones)
 setInterval(loadMessages, 2000);
 
 // File input handler
@@ -330,9 +376,34 @@ function loadMessages() {
     fetch(`/get_messages/${cid}`)
         .then(r => r.text())
         .then(html => {
-            document.getElementById('messagesBox').innerHTML = html;
             let box = document.getElementById('messagesBox');
-            box.scrollTop = box.scrollHeight;
+            let tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            let newMessages = tempDiv.querySelectorAll('.message');
+            let currentMessages = box.querySelectorAll('.message');
+            
+            // Count current messages
+            let currentCount = currentMessages.length;
+            let newCount = newMessages.length;
+            
+            // Only update if there are new messages
+            if (newCount > currentCount || isFirstLoad) {
+                // For first load, replace everything
+                if (isFirstLoad) {
+                    box.innerHTML = html;
+                    isFirstLoad = false;
+                } else {
+                    // Only append new messages
+                    for (let i = currentCount; i < newCount; i++) {
+                        box.appendChild(newMessages[i].cloneNode(true));
+                    }
+                }
+                
+                // Smooth scroll to bottom only when new messages arrive
+                setTimeout(() => {
+                    box.scrollTop = box.scrollHeight;
+                }, 50);
+            }
         })
         .catch(err => console.error('Error loading messages:', err));
 }
@@ -349,11 +420,13 @@ function sendMessage() {
         method: 'POST',
         body: formData
     })
-    .then(r => r.text())
     .then(() => {
         document.getElementById('messageInput').value = '';
         document.getElementById('messageInput').style.height = 'auto';
-        loadMessages();
+        // Wait a tiny bit for the server to save the message before loading
+        setTimeout(() => {
+            loadMessages();
+        }, 100);
     })
     .catch(err => console.error('Error sending message:', err));
 }
@@ -370,7 +443,9 @@ function uploadFile(file) {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            loadMessages();
+            setTimeout(() => {
+                loadMessages();
+            }, 100);
         }
     })
     .catch(err => console.error('Error uploading file:', err));

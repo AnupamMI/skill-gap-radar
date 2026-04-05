@@ -1,190 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create Account - Skill Gap Radar</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% extends "base.html" %}
+
+{% block title %}Register - Skill Gap Radar{% endblock %}
+
+{% block layout %}
+<div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+    <div class="card" style="width: 100%; max-width: 450px; padding: 2.5rem;">
+        <h2 class="font-display text-center mb-2">Create an Account</h2>
+        <p class="text-muted text-center mb-8" style="font-size: 0.9rem;">Kickstart your personalized career roadmap.</p>
         
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .auth-container {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-            width: 100%;
-            max-width: 420px;
-        }
-        
-        .auth-header {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-        
-        .auth-logo {
-            font-size: 32px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        
-        .auth-title {
-            font-size: 20px;
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        
-        .auth-subtitle {
-            font-size: 14px;
-            color: #7f8c8d;
-        }
-        
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .form-group label {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .form-group input,
-        .form-group select {
-            padding: 12px 14px;
-            border: 1px solid #ecf0f1;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: all 0.3s;
-            background: #f8f9fa;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .submit-btn {
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-        
-        .submit-btn:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
-        }
-        
-        .auth-footer {
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 1px solid #ecf0f1;
-        }
-        
-        .auth-footer p {
-            font-size: 14px;
-            color: #7f8c8d;
-            margin: 0;
-        }
-        
-        .auth-footer a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-        
-        .auth-footer a:hover {
-            color: #5568d3;
-        }
-        
-        @media (max-width: 480px) {
-            .auth-container {
-                padding: 30px 20px;
-            }
+        <form action="/register" method="POST">
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" class="form-control" required placeholder="John Doe">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" name="email" class="form-control" required placeholder="name@example.com">
+            </div>
             
-            .auth-title {
-                font-size: 18px;
-            }
-        }
-    </style>
-</head>
-<body>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
 
-<div class="auth-container">
-    
-    <div class="auth-header">
-        <div class="auth-logo">📊 Skill Gap Radar</div>
-        <div class="auth-title">Get Started</div>
-        <p class="auth-subtitle">Create your account to begin your career journey</p>
-    </div>
-
-    <form method="POST">
-        <div class="form-group">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" placeholder="John Developer" required>
-        </div>
+            <div class="form-group mb-8">
+                <label class="form-label">I am a...</label>
+                <select name="role" class="form-control" required>
+                    <option value="student">Student / Learner</option>
+                    <option value="teacher">Mentor / Teacher</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-full" style="padding: 0.875rem;">Create Account</button>
+        </form>
         
-        <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" placeholder="you@example.com" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" placeholder="••••••••" required>
-            <small style="color: #95a5a6; margin-top: 5px;">At least 8 characters recommended</small>
-        </div>
-
-        <div class="form-group">
-            <label for="role">Account Type</label>
-            <select id="role" name="role" required>
-                <option value="">-- Select your role --</option>
-                <option value="student">👨‍💼 Student / Professional</option>
-                <option value="teacher">👨‍🏫 Teacher / Instructor</option>
-            </select>
-        </div>
-
-        <button type="submit" class="submit-btn">Create Account</button>
-    </form>
-
-    <div class="auth-footer">
-        <p>Already have an account? <a href="/login">Sign in here</a></p>
+        <p class="text-center mt-6" style="font-size: 0.9rem;">
+            <span class="text-muted">Already have an account?</span> 
+            <a href="/login" class="text-primary" style="text-decoration: none; font-weight: 500;">Sign in</a>
+        </p>
     </div>
 </div>
-
-</body>
-</html>
+{% endblock %}

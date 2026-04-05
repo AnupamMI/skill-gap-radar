@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Review SDP Proposals - Skill Gap Radar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0A1F44 0%, #1A1A1A 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #FFFFFF;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF 0%, #B8C6DB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+        
+        .back-link {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+        
+        .back-link:hover {
+            color: #B8C6DB;
+            text-decoration: underline;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 16px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #B8C6DB;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+            top: 2px;
+            letter-spacing: 0.3px;
+        }
+        
+        .tab.active {
+            color: #0A1F44;
+            border-bottom-color: #0A1F44;
+        }
+        
+        .tab:hover {
+            color: #FFFFFF;
+        }
+        
+        .tab-count {
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        
+        .tab.active .tab-count {
+            background: #0A1F44;
+            color: white;
+        }
+        
+        .proposals-container {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .proposal-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-left: 3px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .proposal-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .proposal-card.pending {
+            border-left-color: #FFC107;
+        }
+        
+        .proposal-card.approved {
+            border-left-color: #2ED573;
+        }
+        
+        .proposal-card.rejected {
+            border-left-color: #FF6B6B;
+        }
+        
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .proposal-header h3 {
+            color: #FFFFFF;
+            font-size: 18px;
+            flex: 1;
+            font-weight: 700;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            text-transform: uppercase;
+            border: 1px solid;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+            border-color: #FFC107;
+        }
+        
+        .status-approved {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ED573;
+            border-color: #2ED573;
+        }
+        
+        .status-rejected {
+            background: rgba(255, 107, 107, 0.2);
+            color: #FF6B6B;
+            border-color: #FF6B6B;
+        }
+        
+        .group-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #B8C6DB;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .group-info strong {
+            color: #FFFFFF;
+        }
+        
+        .proposal-details {
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            margin-bottom: 15px;
+        }
+        
+        .detail-label {
+            font-weight: 700;
+            color: #B8C6DB;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        
+        .detail-value {
+            color: #FFFFFF;
+            line-height: 1.6;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn {
+            padding: 12px 16px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-approve {
+            background: linear-gradient(135deg, #2ED573 0%, #27a952 100%);
+            color: white;
+        }
+        
+        .btn-approve:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 213, 115, 0.3);
+        }
+        
+        .btn-reject {
+            background: linear-gradient(135deg, #FF6B6B 0%, #E63946 100%);
+            color: white;
+        }
+        
+        .btn-reject:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #B8C6DB;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            letter-spacing: 0.3px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1A2B4A 0%, #0F1820 100%);
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .modal-header {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-body label {
+            display: block;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+        
+        .modal-body textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #FFFFFF;
+        }
+        
+        .modal-body textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .modal-body textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(10, 31, 68, 0.2);
+        }
+        
+        .modal-footer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .modal-footer button {
+            padding: 12px;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+        
+        .modal-btn-confirm {
+            background: linear-gradient(135deg, #2ED573 0%, #27a952 100%);
+            color: white;
+        }
+        
+        .modal-btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 213, 115, 0.3);
+        }
+        
+        .modal-btn-cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #FFFFFF;
+        }
+        }
+        
+        .modal-btn-cancel:hover {
+            background: #d5dbdb;
+        }
+        
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background: #d5f4e6;
+            color: #27ae60;
+            border-color: #27ae60;
+        }
+        
+        .alert-error {
+            background: #fadbd8;
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .proposal-header {
+                flex-direction: column;
+            }
+            
+            .actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>📋 Review SDP Proposals</h1>
+        <a href="/" class="back-link">← Back to Dashboard</a>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab active" onclick="filterProposals('pending')">
+            Pending
+            <span class="tab-count" id="pendingCount">0</span>
+        </button>
+        <button class="tab" onclick="filterProposals('approved')">
+            Approved
+            <span class="tab-count" id="approvedCount">0</span>
+        </button>
+        <button class="tab" onclick="filterProposals('rejected')">
+            Rejected
+            <span class="tab-count" id="rejectedCount">0</span>
+        </button>
+    </div>
+    
+    <div id="alertContainer"></div>
+    <div id="proposalsContainer" class="proposals-container"></div>
+</div>
+
+<!-- Approval Modal -->
+<div id="approvalModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">✓ Approve Proposal</div>
+        <div class="modal-body">
+            <label for="approvalComment">Feedback (Optional)</label>
+            <textarea id="approvalComment" placeholder="Provide feedback or requirements for the group..."></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn-confirm" onclick="confirmApproval()">Approve</button>
+            <button class="modal-btn-cancel" onclick="closeApprovalModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Rejection Modal -->
+<div id="rejectionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">✗ Reject Proposal</div>
+        <div class="modal-body">
+            <label for="rejectionComment">Feedback (Required)</label>
+            <textarea id="rejectionComment" placeholder="Provide constructive feedback for improvements..."></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="modal-btn-confirm" style="background: #e74c3c;" onclick="confirmRejection()">Reject</button>
+            <button class="modal-btn-cancel" onclick="closeRejectionModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let allProposals = [];
+let currentFilter = 'pending';
+let pendingAction = null;
+
+document.addEventListener('DOMContentLoaded', loadProposals);
+
+function loadProposals() {
+    fetch('/get_proposals')
+        .then(r => r.json())
+        .then(data => {
+            allProposals = data.proposals || [];
+            updateCounts();
+            displayProposals(currentFilter);
+        })
+        .catch(err => {
+            console.error('Error loading proposals:', err);
+            showAlert('Failed to load proposals', 'error');
+        });
+}
+
+function updateCounts() {
+    const pending = allProposals.filter(p => p.status === 'pending').length;
+    const approved = allProposals.filter(p => p.status === 'approved').length;
+    const rejected = allProposals.filter(p => p.status === 'rejected').length;
+    
+    document.getElementById('pendingCount').textContent = pending;
+    document.getElementById('approvedCount').textContent = approved;
+    document.getElementById('rejectedCount').textContent = rejected;
+}
+
+function filterProposals(status) {
+    currentFilter = status;
+    
+    // Update active tab
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    event.target.closest('.tab').classList.add('active');
+    
+    displayProposals(status);
+}
+
+function displayProposals(status) {
+    const container = document.getElementById('proposalsContainer');
+    const filtered = allProposals.filter(p => p.status === status);
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <p>No ${status} proposals yet</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = filtered.map(p => `
+        <div class="proposal-card ${p.status}">
+            <div class="proposal-header">
+                <h3>${p.title}</h3>
+                <span class="status-badge status-${p.status}">
+                    ${p.status.toUpperCase()}
+                </span>
+            </div>
+            
+            <div class="group-info">
+                <strong>👥 Group:</strong> ${p.group_name} | 
+                <strong>👤 Leader:</strong> ${p.leader_name}
+            </div>
+            
+            <div class="proposal-details">
+                <div class="detail-item">
+                    <div class="detail-label">📝 Description</div>
+                    <div class="detail-value">${p.description}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">⚙️ Technology Stack</div>
+                    <div class="detail-value">${p.tech_stack}</div>
+                </div>
+                
+                <div class="detail-item">
+                    <div class="detail-label">📅 Timeline</div>
+                    <div class="detail-value">${p.timeline}</div>
+                </div>
+                
+                ${p.teacher_comment ? `
+                <div class="detail-item">
+                    <div class="detail-label">💬 Teacher Feedback</div>
+                    <div class="detail-value">${p.teacher_comment}</div>
+                </div>
+                ` : ''}
+            </div>
+            
+            ${p.status === 'pending' ? `
+            <div class="actions">
+                <button class="btn btn-approve" onclick="openApprovalModal(${p.id})">
+                    ✓ Approve
+                </button>
+                <button class="btn btn-reject" onclick="openRejectionModal(${p.id})">
+                    ✗ Reject
+                </button>
+            </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+function openApprovalModal(proposalId) {
+    pendingAction = { proposal_id: proposalId, action: 'approve' };
+    document.getElementById('approvalComment').value = '';
+    document.getElementById('approvalModal').classList.add('show');
+}
+
+function closeApprovalModal() {
+    document.getElementById('approvalModal').classList.remove('show');
+    pendingAction = null;
+}
+
+function confirmApproval() {
+    if (!pendingAction) return;
+    
+    const comment = document.getElementById('approvalComment').value.trim();
+    const proposalId = pendingAction.proposal_id;
+    
+    const formData = new FormData();
+    formData.append('comment', comment);
+    
+    fetch(`/approve_proposal/${proposalId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('✓ Proposal approved successfully', 'success');
+            closeApprovalModal();
+            loadProposals();
+        } else {
+            showAlert('Error: ' + (data.error || 'Failed to approve'), 'error');
+        }
+    })
+    .catch(err => {
+        showAlert('Error: ' + err.message, 'error');
+    });
+}
+
+function openRejectionModal(proposalId) {
+    pendingAction = { proposal_id: proposalId, action: 'reject' };
+    document.getElementById('rejectionComment').value = '';
+    document.getElementById('rejectionModal').classList.add('show');
+}
+
+function closeRejectionModal() {
+    document.getElementById('rejectionModal').classList.remove('show');
+    pendingAction = null;
+}
+
+function confirmRejection() {
+    if (!pendingAction) return;
+    
+    const comment = document.getElementById('rejectionComment').value.trim();
+    const proposalId = pendingAction.proposal_id;
+    
+    if (!comment) {
+        showAlert('⚠️ Please provide feedback for rejection', 'error');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('comment', comment);
+    
+    fetch(`/reject_proposal/${proposalId}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('✓ Proposal rejected', 'success');
+            closeRejectionModal();
+            loadProposals();
+        } else {
+            showAlert('Error: ' + (data.error || 'Failed to reject'), 'error');
+        }
+    })
+    .catch(err => {
+        showAlert('Error: ' + err.message, 'error');
+    });
+}
+
+function showAlert(message, type) {
+    const container = document.getElementById('alertContainer');
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-' + type;
+    alert.textContent = message;
+    container.innerHTML = '';
+    container.appendChild(alert);
+}
+
+// Close modals on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeApprovalModal();
+        closeRejectionModal();
+    }
+});
+</script>
+
+</body>
+</html>
