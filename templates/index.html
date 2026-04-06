@@ -68,6 +68,9 @@
     position: relative;
     overflow: hidden;
   }
+  @media (max-width: 768px) {
+    .skills-galaxy-section { padding-top: 120px; }
+  }
 
   .galaxy-header { margin-bottom: 52px; }
   .galaxy-eyebrow {
@@ -80,23 +83,23 @@
   }
   .galaxy-header h2 {
     font-family: 'Syne', sans-serif;
-    font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+    font-size: clamp(2.4rem, 8vw, 4.2rem); /* More aggressive scaling */
     font-weight: 700; color: #fff;
-    letter-spacing: -0.03em; line-height: 1.05;
+    letter-spacing: -0.03em; line-height: 1.15; /* Better line height for mobile */
   }
   .galaxy-subtitle {
-    font-size: 1.18rem; color: #94a3b8; max-width: 620px; margin: 0 auto;
-    line-height: 1.55;
+    font-size: 1.1rem; color: #94a3b8; max-width: 620px; margin: 0 auto;
+    line-height: 1.6;
   }
 
   /* ── Filter bar ── */
   .category-filters {
     display: flex; flex-wrap: wrap; justify-content: center;
-    gap: 12px; margin-bottom: 48px; padding: 0 16px;
+    gap: 8px; margin-bottom: 32px; padding: 0 16px;
   }
   .filter-btn {
-    padding: 10px 24px; border-radius: 9999px;
-    font-size: 0.9rem; font-weight: 500;
+    padding: 8px 18px; border-radius: 9999px;
+    font-size: 0.8rem; font-weight: 500;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
     color: #9ca3af; cursor: pointer; transition: all 0.3s ease;
@@ -122,7 +125,7 @@
     box-shadow: 0 25px 60px rgba(0,0,0,0.6);
   }
   @media (min-width: 768px)  { .galaxy-canvas-container { height: 660px; } }
-  @media (max-width: 640px)  { .galaxy-canvas-container { height: 460px; } .filter-btn { padding: 8px 16px; font-size: 0.82rem; } }
+  @media (max-width: 640px)  { .galaxy-canvas-container { height: 500px; } .filter-btn { padding: 6px 14px; font-size: 0.75rem; } }
 
   /* ── Hint text ── */
   .galaxy-hint-text {
