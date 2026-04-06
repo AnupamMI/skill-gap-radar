@@ -5,21 +5,29 @@
 {% endblock %}
 
 {% block content %}
-<div class="dashboard">
+<div class="dashboard" style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
     <!-- Header -->
     <div class="header">
-        <h1 style="font-family: 'Syne', sans-serif; font-size: 2.8rem; letter-spacing: -2px; margin-bottom: 8px;">
+        <p class="text-accent uppercase font-bold mb-2" style="font-size: 0.85rem; letter-spacing: 0.15em;">
+            Faculty Control / 
+            {% if active == 'dashboard' %}Projects
+            {% elif active == 'requests' %}Admissions
+            {% elif active == 'groups' %}Cohorts
+            {% elif active == 'discovery' %}Network
+            {% endif %}
+        </p>
+        <h1 style="font-family: 'Syne', sans-serif; font-size: 3rem; letter-spacing: -2px; margin-bottom: 8px;">
             {% if active == 'dashboard' %}Project Management
             {% elif active == 'requests' %}Student Applications
-            {% elif active == 'groups' %}Monitoring
-            {% elif active == 'discovery' %}Discovery
+            {% elif active == 'groups' %}Cohort Monitoring
+            {% elif active == 'discovery' %}Network Discovery
             {% endif %}
         </h1>
-        <p class="text-muted" style="max-width: 600px; font-size: 1.1rem;">
-            {% if active == 'dashboard' %}Manage your projects, review AI-matched students, and make admissions decisions.
-            {% elif active == 'requests' %}Review and manage student applications across all your projects.
-            {% elif active == 'groups' %}Real-time project telemetry and collaborative growth metrics.
-            {% elif active == 'discovery' %}Audit external engineering cohorts across the Skill Gap Radar platform.
+        <p class="text-muted" style="max-width: 620px; font-size: 1.15rem; line-height: 1.6;">
+            {% if active == 'dashboard' %}Orchestrate your research projects, conduct AI-driven audits, and build your engineering team.
+            {% elif active == 'requests' %}Review and manage incoming talent applications across your active project nodes.
+            {% elif active == 'groups' %}Real-time project telemetry and collaborative growth metrics for your active cohorts.
+            {% elif active == 'discovery' %}Audit external engineering intelligence across the regional Skill Gap Radar network.
             {% endif %}
         </p>
     </div>
@@ -28,94 +36,97 @@
     {% if active == 'dashboard' %}
     
     <!-- Stats Row -->
-    <div class="stats-grid" id="dashboard-stats">
-        <div class="glass-card" style="border-bottom: 3px solid var(--accent);">
-            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.95rem; letter-spacing: 0.1em">Active Projects</div>
-            <h2 style="font-size: 2.5rem; color: var(--accent);" id="stat-projects">-</h2>
+    <div class="stats-grid" id="dashboard-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
+        <div class="glass-card animate-slide-up" style="border-bottom: 3px solid var(--accent); padding: 28px; animation-delay: 0.1s;">
+            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.75rem; letter-spacing: 0.1em">Active Nodes</div>
+            <h2 style="font-size: 2.5rem; color: var(--accent); margin: 0;" id="stat-projects">-</h2>
         </div>
-        <div class="glass-card" style="border-bottom: 3px solid #8b5cf6;">
-            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.95rem; letter-spacing: 0.1em">Total Applications</div>
-            <h2 style="font-size: 2.5rem;" id="stat-applications">-</h2>
+        <div class="glass-card animate-slide-up" style="border-bottom: 3px solid #8b5cf6; padding: 28px; animation-delay: 0.2s;">
+            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.75rem; letter-spacing: 0.1em">Total Applicants</div>
+            <h2 style="font-size: 2.5rem; color: #fff; margin: 0;" id="stat-applications">-</h2>
         </div>
-        <div class="glass-card" style="border-bottom: 3px solid #f59e0b;">
-            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.95rem; letter-spacing: 0.1em">Pending Review</div>
-            <h2 style="font-size: 2.5rem;" id="stat-pending">-</h2>
+        <div class="glass-card animate-slide-up" style="border-bottom: 3px solid #f59e0b; padding: 28px; animation-delay: 0.3s;">
+            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.75rem; letter-spacing: 0.1em">Awaiting Audit</div>
+            <h2 style="font-size: 2.5rem; color: #f59e0b; margin: 0;" id="stat-pending">-</h2>
         </div>
     </div>
 
     <!-- Create Project Section -->
-    <div class="glass-card mb-6">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="mb-0">Create New Project</h3>
-            <button class="glass-btn" onclick="toggleCreateForm()" id="create-btn">+ New Project</button>
+    <div class="glass-card mb-2 animate-slide-up" style="padding: 28px; animation-delay: 0.4s;">
+        <div class="flex justify-between items-center mb-6">
+            <h3 style="font-size: 1.4rem; margin: 0;">Initiate Project Node</h3>
+            <button class="glass-btn glass-btn-primary" onclick="toggleCreateForm()" id="create-btn">
+                <i data-lucide="plus" style="width: 18px; margin-right: 8px;"></i>
+                Deploy Project
+            </button>
         </div>
-        <form id="create-project-form" style="display: none;" class="animate-slide-up">
-            <div class="grid grid-2 gap-4 mb-4">
+        <form id="create-project-form" style="display: none; border-top: 1px solid var(--border); padding-top: 24px; margin-top: 24px;">
+            <div class="grid grid-2 gap-6 mb-6">
                 <div class="form-group flex-col gap-2">
-                    <label class="text-muted uppercase text-sm font-bold">Project Title *</label>
-                    <input type="text" id="new-title" class="glass-input" placeholder="e.g., AI Resume Parser" required>
+                    <label class="text-muted uppercase text-xs font-bold" style="letter-spacing: 1px;">Project Designation *</label>
+                    <input type="text" id="new-title" class="glass-input p-4" placeholder="e.g., Quantum Intelligence Cluster" required>
                 </div>
                 <div class="form-group flex-col gap-2">
-                    <label class="text-muted uppercase text-sm font-bold">Required Skills *</label>
-                    <input type="text" id="new-skills" class="glass-input" placeholder="Python, ML, Flask (comma-separated)" required>
+                    <label class="text-muted uppercase text-xs font-bold" style="letter-spacing: 1px;">Target Skill Matrix *</label>
+                    <input type="text" id="new-skills" class="glass-input p-4" placeholder="Python, ML, Flask (comma-separated)" required>
                 </div>
             </div>
-            <div class="form-group flex-col gap-2 mb-4">
-                <label class="text-muted uppercase text-sm font-bold">Description</label>
-                <textarea id="new-description" class="glass-input" rows="2" placeholder="Describe the project scope..."></textarea>
+            <div class="form-group flex-col gap-2 mb-6">
+                <label class="text-muted uppercase text-xs font-bold" style="letter-spacing: 1px;">Execution Scope</label>
+                <textarea id="new-description" class="glass-input p-4" rows="3" placeholder="Define the technical boundaries and research goals..."></textarea>
             </div>
-            <div id="create-error" class="text-error mb-3" style="display: none;"></div>
-            <div id="create-success" class="text-success mb-3" style="display: none;"></div>
-            <div class="flex gap-2">
-                <button type="button" class="glass-btn" onclick="toggleCreateForm()">Cancel</button>
-                <button type="submit" class="glass-btn glass-btn-primary">Post Project</button>
+            <div id="create-error" class="text-error mb-4" style="display: none; background: rgba(248, 113, 113, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(248, 113, 113, 0.2);"></div>
+            <div id="create-success" class="text-success mb-4" style="display: none; background: rgba(74, 222, 128, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(74, 222, 128, 0.2);"></div>
+            <div class="flex gap-4">
+                <button type="button" class="glass-btn w-32" onclick="toggleCreateForm()">Abort</button>
+                <button type="submit" class="glass-btn glass-btn-primary flex-1">Confirm Deployment</button>
             </div>
         </form>
     </div>
 
     <!-- Projects List -->
-    <div class="glass-card">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="mb-0">Your Projects</h3>
-            <button class="glass-btn" onclick="loadProjects()" title="Refresh">
+    <div class="animate-slide-up" style="animation-delay: 0.5s;">
+        <div class="flex justify-between items-center mb-6 px-2">
+            <h3 style="font-size: 1.4rem; margin: 0;">Active Research Nodes</h3>
+            <button class="glass-btn btn-sm" onclick="loadProjects()" title="Resync Data Feed" style="padding: 10px;">
                 <i data-lucide="refresh-cw" style="width: 16px;"></i>
             </button>
         </div>
-        <div id="projects-container">
-            <div class="flex justify-center py-12">
-                <div class="text-muted">Loading projects...</div>
+        <div id="projects-container" style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="glass-card flex justify-center py-20">
+                <div class="text-muted" style="letter-spacing: 2px; font-size: 0.8rem; text-transform: uppercase;">Awaiting Synchronization...</div>
             </div>
         </div>
     </div>
 
     <!-- ── REQUESTS (Applications View) ── -->
     {% elif active == 'requests' %}
-    <div class="glass-card mb-6">
-        <h3 class="mb-2">All Applications</h3>
-        <p class="text-muted">Review and manage student applications across all your projects.</p>
+    <div class="glass-card mb-8 animate-slide-up" style="padding: 28px;">
+        <h3 style="font-size: 1.4rem; margin: 0 0 8px 0;">Unified Audit Log</h3>
+        <p class="text-muted" style="margin: 0;">Review and verify student applications across your entire engineering network.</p>
     </div>
-    <div id="all-applications-container">
-        <div class="flex justify-center py-12">
-            <div class="text-muted">Loading applications...</div>
+    <div id="all-applications-container" class="animate-slide-up" style="animation-delay: 0.2s;">
+        <div class="glass-card flex justify-center py-20">
+            <div class="text-muted" style="letter-spacing: 2px; font-size: 0.8rem; text-transform: uppercase;">Streaming application nodes...</div>
         </div>
     </div>
 
     <!-- ── MONITORING ── -->
     {% elif active == 'groups' %}
-    <div class="main-section" style="grid-template-columns: 1fr;">
-        <div id="monitoring-grid" class="grid grid-auto gap-6">
-            <p class="text-muted">Synchronizing group metrics...</p>
+    <div class="main-section animate-slide-up" style="grid-template-columns: 1fr;">
+        <div id="monitoring-grid" class="grid grid-auto gap-8">
+            <p class="text-muted">Synchronizing production telemetry...</p>
         </div>
     </div>
 
     <!-- ── DISCOVERY NETWORK ── -->
     {% elif active == 'discovery' %}
-    <div class="flex-col gap-6">
-        <div class="glass-card mb-6">
-            <h3 class="mb-2">Network Discovery</h3>
-            <p class="text-muted">Audit external engineering cohorts across the Skill Gap Radar platform.</p>
+    <div class="flex-col gap-8">
+        <div class="glass-card mb-8 animate-slide-up" style="padding: 28px;">
+            <h3 style="font-size: 1.4rem; margin: 0 0 8px 0;">Intelligence Recon</h3>
+            <p class="text-muted" style="margin: 0;">Audit external engineering cohorts and high-potential talent nodes across the platform.</p>
         </div>
-        <div id="discovery-grid" class="grid grid-auto gap-6 mt-4">
+        <div id="discovery-grid" class="grid grid-auto gap-8 animate-slide-up" style="animation-delay: 0.2s;">
             <p class="text-muted">Interfacing with available engineering networks...</p>
         </div>
     </div>

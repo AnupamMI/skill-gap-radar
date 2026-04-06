@@ -1,294 +1,103 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Analysis History - Skill Gap Radar</title>
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+{% extends "base.html" %}
 
-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #0A1F44 0%, #1A1A1A 100%);
-    min-height: 100vh;
-    padding: 40px 20px;
-    color: #FFFFFF;
-}
+{% block title %}Analysis History - SkillGap{% endblock %}
 
-.container {
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-.page-header {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 45px 40px;
-    border-radius: 16px;
-    margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.page-header h1 {
-    font-size: 32px;
-    font-weight: 800;
-    background: linear-gradient(135deg, #FFFFFF 0%, #B8C6DB 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -1px;
-}
-
-.back-link {
-    color: #FFFFFF;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s;
-    font-size: 14px;
-    letter-spacing: 0.3px;
-}
-
-.back-link:hover {
-    color: #B8C6DB;
-    text-decoration: underline;
-}
-
-.report-card {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 35px;
-    margin-bottom: 25px;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    border-left: 3px solid #0A1F44;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-.report-card:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-    transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.report-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.report-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #FFFFFF;
-    letter-spacing: -0.5px;
-}
-
-.role-badge {
-    background: #3498db;
-    color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.skill-section {
-    margin: 20px 0;
-}
-
-.skill-section h3 {
-    font-size: 14px;
-    color: #7f8c8d;
-    font-weight: 600;
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.skill-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.skill-tag {
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.skill-strong {
-    background: #d5f4e6;
-    color: #27ae60;
-}
-
-.skill-moderate {
-    background: #fef5e7;
-    color: #f39c12;
-}
-
-.skill-missing {
-    background: #fadbd8;
-    color: #e74c3c;
-}
-
-.teacher-verified {
-    display: inline-block;
-    background: #9b59b6;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 0.85rem;
-    margin-left: 5px;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    background: white;
-    border-radius: 12px;
-}
-
-.empty-icon {
-    font-size: 48px;
-    margin-bottom: 15px;
-    opacity: 0.6;
-}
-
-.empty-state p {
-    color: #7f8c8d;
-    margin-bottom: 20px;
-}
-
-.empty-state a {
-    display: inline-block;
-    background: #3498db;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.empty-state a:hover {
-    background: #2980b9;
-    transform: translateY(-2px);
-}
-
-@media (max-width: 768px) {
-    .page-header {
-        flex-direction: column;
-        text-align: center;
-        gap: 20px;
-    }
-    
-    .report-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-    
-    <div class="page-header">
-        <h1>📈 Your Analysis History</h1>
-        <a href="/" class="back-link">← Back to Home</a>
+{% block content %}
+<div class="dashboard" style="max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
+    <!-- Header -->
+    <div class="header">
+        <p class="text-accent uppercase font-bold mb-2" style="font-size: 0.85rem; letter-spacing: 0.15em;">User / Analytics</p>
+        <h1 style="font-family: 'Syne', sans-serif; font-size: 2.8rem; letter-spacing: -2.2px; margin-bottom: 8px;">
+            Analysis History
+        </h1>
+        <p class="text-muted" style="font-size: 1.1rem; max-width: 600px;">Review your evolutionary progress across various engineering roles.</p>
     </div>
 
     {% if reports %}
-        {% for r in reports %}
-        <div class="report-card">
-            
-            <div class="report-header">
-                <span class="report-title">Target Role: <strong>{{ r.role|title }}</strong></span>
-                <span class="role-badge">Report #{{ r.id }}</span>
-            </div>
+        <div class="reports-timeline" style="display: flex; flex-direction: column; gap: 24px;">
+            {% for r in reports %}
+            <div class="glass-card animate-slide-up" style="padding: 32px; border-left: 4px solid var(--accent); transition: transform 0.3s ease; animation-delay: {{ loop.index0 * 0.1 }}s;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+                    <div>
+                        <span class="text-accent uppercase font-bold" style="font-size: 0.75rem; letter-spacing: 0.1em;">Target Architecture</span>
+                        <h3 style="font-size: 1.8rem; margin: 4px 0 0 0; color: #fff;">{{ r.role|title }}</h3>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="text-muted" style="display: block; font-size: 0.8rem; margin-bottom: 4px;">Node Audit #{{ r.id }}</span>
+                        <span class="glass-btn btn-sm" style="font-size: 0.7rem; padding: 4px 12px; border-radius: 20px;">VERIFIED</span>
+                    </div>
+                </div>
 
-            <div class="skill-section">
-                <h3>✓ Strong Skills</h3>
-                <div class="skill-list">
-                    {% if r.strong %}
-                        {% for s in r.strong %}
-                        <div class="skill-tag skill-strong">
-                            <span>{{ s|title }}</span>
-                            {% if r.ratings.get(s) and r.ratings[s] == 5 %}
-                                <span class="teacher-verified">Verified</span>
+                <div class="grid grid-3 gap-6">
+                    <!-- Strong Skills -->
+                    <div>
+                        <h4 class="text-muted uppercase font-bold mb-4" style="font-size: 0.75rem; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="shield-check" style="width: 14px; color: #4ade80;"></i>
+                            Strong Assets
+                        </h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            {% if r.strong %}
+                                {% for s in r.strong %}
+                                <span class="skill-badge matched" style="background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.2); color: #4ade80;">{{ s|title }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted" style="font-size: 0.85rem; font-style: italic;">None identified</p>
                             {% endif %}
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <p style="color: #95a5a6;">No strong skills recorded yet</p>
-                    {% endif %}
-                </div>
-            </div>
+                    </div>
 
-            <div class="skill-section">
-                <h3>⬆ Skills to Improve</h3>
-                <div class="skill-list">
-                    {% if r.moderate %}
-                        {% for s in r.moderate %}
-                        <div class="skill-tag skill-moderate">
-                            <span>{{ s|title }}</span>
-                            {% if r.ratings.get(s) %}
-                                <span class="teacher-verified">
-                                    {% if r.ratings[s] == 5 %} Strong
-                                    {% elif r.ratings[s] == 3 %} Average
-                                    {% else %} Weak
-                                    {% endif %}
-                                </span>
+                    <!-- Moderate Skills -->
+                    <div>
+                        <h4 class="text-muted uppercase font-bold mb-4" style="font-size: 0.75rem; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="trending-up" style="width: 14px; color: #fbbf24;"></i>
+                            Growth Areas
+                        </h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            {% if r.moderate %}
+                                {% for s in r.moderate %}
+                                <span class="skill-badge" style="background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.2); color: #fbbf24;">{{ s|title }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted" style="font-size: 0.85rem; font-style: italic;">None identified</p>
                             {% endif %}
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <p style="color: #95a5a6;">No moderate skills recorded yet</p>
-                    {% endif %}
+                    </div>
+
+                    <!-- Missing Skills -->
+                    <div>
+                        <h4 class="text-muted uppercase font-bold mb-4" style="font-size: 0.75rem; letter-spacing: 0.05em; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="alert-triangle" style="width: 14px; color: #f87171;"></i>
+                            Critical Gaps
+                        </h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            {% if r.missing %}
+                                {% for s in r.missing %}
+                                <span class="skill-badge missing" style="background: rgba(248, 113, 113, 0.1); border-color: rgba(248, 113, 113, 0.2); color: #f87171;">{{ s|title }}</span>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted" style="font-size: 0.85rem; font-style: italic;">Zero gaps detected</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="skill-section">
-                <h3>✗ Missing Skills</h3>
-                <div class="skill-list">
-                    {% if r.missing %}
-                        {% for s in r.missing %}
-                        <div class="skill-tag skill-missing">{{ s|title }}</div>
-                        {% endfor %}
-                    {% else %}
-                        <p style="color: #95a5a6;">No missing skills identified</p>
-                    {% endif %}
-                </div>
-            </div>
-
+            {% endfor %}
         </div>
-        {% endfor %}
     {% else %}
-        <div class="empty-state">
-            <div class="empty-icon">📊</div>
-            <p>You haven't generated any analysis reports yet.</p>
-            <p style="font-size: 13px; margin-bottom: 25px;">Start by uploading your resume and GitHub profile to get your personalized skill gap analysis.</p>
-            <a href="/">Generate Your First Report</a>
+        <div class="glass-card flex-col items-center justify-center text-center py-20 animate-slide-up" style="gap: 20px;">
+            <div style="background: rgba(255,255,255,0.03); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; border: 1px solid var(--border);">
+                <i data-lucide="database" style="width: 32px; color: var(--accent);"></i>
+            </div>
+            <h3 style="font-size: 1.5rem; margin: 0;">No Analysis Logs Detected</h3>
+            <p class="text-muted" style="max-width: 400px; margin: 0;">Upload your engineering profile to start tracking your skill evolution across the platform.</p>
+            <a href="/" class="glass-btn glass-btn-primary mt-4" style="padding: 12px 32px;">Run First Analysis</a>
         </div>
     {% endif %}
-
 </div>
 
-</body>
-</html>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+    });
+</script>
+{% endblock %}

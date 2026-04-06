@@ -3,102 +3,105 @@
 {% block title %}Discovery Network - SkillGap{% endblock %}
 
 {% block content %}
-<div class="dashboard">
+<div class="dashboard" style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px;">
     <!-- Header -->
     <div class="header">
-        <h1 class="font-display text-accent mb-2">Collaboration Network</h1>
-        <p class="text-muted">Discover peers, active groups, and opportunities. Build your team.</p>
+        <p class="text-accent uppercase font-bold mb-2" style="font-size: 0.85rem; letter-spacing: 0.15em;">Network / Discovery</p>
+        <h1 style="font-family: 'Syne', sans-serif; font-size: 2.5rem; letter-spacing: -1.5px; margin-bottom: 8px;">
+            Collaboration Network
+        </h1>
+        <p class="text-muted" style="font-size: 1.1rem; max-width: 600px;">Discover peers, active groups, and opportunities. Build your team.</p>
     </div>
 
     <!-- Filters -->
-    <div class="glass-card mb-6" style="padding: 20px;">
-        <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center;">
+    <div class="glass-card" style="padding: 24px;">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end;">
             <div style="flex: 1; min-width: 200px;">
-                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block;">Filter by Skills</label>
+                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block; letter-spacing: 0.05em;">Filter by Skills</label>
                 <input type="text" id="skill-filter" class="glass-input" placeholder="e.g., Python, React" onkeyup="applyFilters()">
             </div>
-            <div style="min-width: 150px;">
-                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block;">Availability</label>
+            <div style="min-width: 160px;">
+                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block; letter-spacing: 0.05em;">Availability</label>
                 <select id="availability-filter" class="glass-input" onchange="applyFilters()">
-                    <option value="">All</option>
+                    <option value="">All Statuses</option>
                     <option value="available">Available</option>
                     <option value="busy">Busy</option>
                     <option value="open_to_collaborate">Open to Collaborate</option>
                 </select>
             </div>
-            <div style="min-width: 150px;">
-                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block;">View</label>
+            <div style="min-width: 160px;">
+                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block; letter-spacing: 0.05em;">View Mode</label>
                 <select id="view-mode" class="glass-input" onchange="switchView()">
-                    <option value="all">All</option>
-                    <option value="students">Students</option>
-                    <option value="groups">Groups</option>
-                    <option value="projects">Projects</option>
+                    <option value="all">All Items</option>
+                    <option value="students">Students Only</option>
+                    <option value="groups">Groups Only</option>
+                    <option value="projects">Projects Only</option>
                 </select>
             </div>
-            <button class="glass-btn glass-btn-primary" onclick="openCreateGroupModal()" style="margin-top: 20px;">
-                <i data-lucide="plus" style="width: 16px; margin-right: 8px;"></i>
+            <button class="glass-btn glass-btn-primary" onclick="openCreateGroupModal()" style="height: 46px;">
+                <i data-lucide="plus" style="width: 18px; margin-right: 8px;"></i>
                 Create Group
             </button>
         </div>
     </div>
 
     <!-- Stats Row -->
-    <div class="stats-grid" id="network-stats" style="margin-bottom: 32px;">
-        <div class="glass-card" style="border-bottom: 3px solid var(--accent);">
-            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.85rem; letter-spacing: 0.1em">Active Students</div>
-            <h2 style="font-size: 2.5rem; color: var(--accent);" id="stat-students">-</h2>
+    <div class="stats-grid" id="network-stats">
+        <div class="glass-card" style="text-align: center; padding: 24px; border-bottom: 3px solid var(--accent);">
+            <p class="text-muted uppercase font-bold mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">Active Students</p>
+            <h2 style="font-size: 2.2rem; color: var(--accent);" id="stat-students">-</h2>
         </div>
-        <div class="glass-card" style="border-bottom: 3px solid #8b5cf6;">
-            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.85rem; letter-spacing: 0.1em">Active Groups</div>
-            <h2 style="font-size: 2.5rem; color: #8b5cf6;" id="stat-groups">-</h2>
+        <div class="glass-card" style="text-align: center; padding: 24px; border-bottom: 3px solid #8b5cf6;">
+            <p class="text-muted uppercase font-bold mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">Active Groups</p>
+            <h2 style="font-size: 2.2rem; color: #8b5cf6;" id="stat-groups">-</h2>
         </div>
-        <div class="glass-card" style="border-bottom: 3px solid #4ade80;">
-            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.85rem; letter-spacing: 0.1em">Open Projects</div>
-            <h2 style="font-size: 2.5rem; color: #4ade80;" id="stat-projects">-</h2>
+        <div class="glass-card" style="text-align: center; padding: 24px; border-bottom: 3px solid #4ade80;">
+            <p class="text-muted uppercase font-bold mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">Open Projects</p>
+            <h2 style="font-size: 2.2rem; color: #4ade80;" id="stat-projects">-</h2>
         </div>
-        <div class="glass-card" style="border-bottom: 3px solid #fbbf24;">
-            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.85rem; letter-spacing: 0.1em">My Groups</div>
-            <h2 style="font-size: 2.5rem; color: #fbbf24;" id="stat-my-groups">-</h2>
+        <div class="glass-card" style="text-align: center; padding: 24px; border-bottom: 3px solid #fbbf24;">
+            <p class="text-muted uppercase font-bold mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">My Groups</p>
+            <h2 style="font-size: 2.2rem; color: #fbbf24;" id="stat-my-groups">-</h2>
         </div>
     </div>
 
     <!-- Content Sections -->
-    <div class="main-section">
+    <div class="main-section" style="display: flex; flex-direction: column; gap: 48px;">
         <!-- Students Section -->
         <div class="content-section" id="students-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h3 class="font-display">Students</h3>
-                <span class="text-muted" id="students-count"></span>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                <h3 style="font-size: 1.5rem; margin: 0;">Verified Engineering Talent</h3>
+                <span class="text-muted" id="students-count" style="font-size: 0.9rem;"></span>
             </div>
             <div class="discovery-grid" id="students-grid">
-                <div class="glass-card text-center py-12" style="grid-column: 1/-1;">
-                    <p class="text-muted">Loading students...</p>
+                <div class="glass-card text-center" style="grid-column: 1/-1; padding: 60px 0;">
+                    <p class="text-muted">Interfacing with available engineering networks...</p>
                 </div>
             </div>
         </div>
 
         <!-- Groups Section -->
         <div class="content-section" id="groups-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h3 class="font-display">Active Groups</h3>
-                <span class="text-muted" id="groups-count"></span>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                <h3 style="font-size: 1.5rem; margin: 0;">Active Peer Cohorts</h3>
+                <span class="text-muted" id="groups-count" style="font-size: 0.9rem;"></span>
             </div>
             <div class="discovery-grid" id="groups-grid">
-                <div class="glass-card text-center py-12" style="grid-column: 1/-1;">
-                    <p class="text-muted">Loading groups...</p>
+                <div class="glass-card text-center" style="grid-column: 1/-1; padding: 60px 0;">
+                    <p class="text-muted">Scanning active group frequencies...</p>
                 </div>
             </div>
         </div>
 
         <!-- Projects Section -->
         <div class="content-section" id="projects-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h3 class="font-display">Open Projects</h3>
-                <span class="text-muted" id="projects-count"></span>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                <h3 style="font-size: 1.5rem; margin: 0;">Open Research & Dev Projects</h3>
+                <span class="text-muted" id="projects-count" style="font-size: 0.9rem;"></span>
             </div>
             <div class="discovery-grid" id="projects-grid">
-                <div class="glass-card text-center py-12" style="grid-column: 1/-1;">
-                    <p class="text-muted">Loading projects...</p>
+                <div class="glass-card text-center" style="grid-column: 1/-1; padding: 60px 0;">
+                    <p class="text-muted">Awaiting faculty data nodes...</p>
                 </div>
             </div>
         </div>
@@ -108,37 +111,33 @@
 <!-- Create Group Modal -->
 <div id="create-group-modal" class="modal" style="display: none;">
     <div class="modal-overlay" onclick="closeCreateGroupModal()"></div>
-    <div class="modal-content glass-card" style="max-width: 600px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h3>Create New Group</h3>
-            <button class="glass-btn" onclick="closeCreateGroupModal()">
-                <i data-lucide="x" style="width: 20px;"></i>
+    <div class="modal-content glass-card" style="max-width: 600px; padding: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+            <h3 style="font-size: 1.5rem; margin: 0;">Initiate New Cohort</h3>
+            <button class="glass-btn btn-sm" onclick="closeCreateGroupModal()" style="border-radius: 50%; width: 36px; height: 36px; padding: 0;">
+                <i data-lucide="x" style="width: 18px;"></i>
             </button>
         </div>
-        <form id="create-group-form" onsubmit="createGroup(event)">
-            <div class="form-group mb-4">
-                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block;">Group Name *</label>
+        <form id="create-group-form" onsubmit="createGroup(event)" style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="form-group">
+                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block; letter-spacing: 0.05em;">Group Designation *</label>
                 <input type="text" name="name" class="glass-input" placeholder="e.g., AI Research Squad" required>
             </div>
-            <div class="form-group mb-4">
-                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block;">Project Title</label>
+            <div class="form-group">
+                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block; letter-spacing: 0.05em;">Project Objective</label>
                 <input type="text" name="project_title" class="glass-input" placeholder="What are you building?">
             </div>
-            <div class="form-group mb-4">
-                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block;">Goal / Mission</label>
-                <textarea name="goal" class="glass-input" rows="2" placeholder="Brief description of your group's objective"></textarea>
+            <div class="form-group">
+                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block; letter-spacing: 0.05em;">Architecture Overview</label>
+                <textarea name="description" class="glass-input" rows="4" placeholder="Technical details, stack, and mission statement..."></textarea>
             </div>
-            <div class="form-group mb-4">
-                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block;">Description</label>
-                <textarea name="description" class="glass-input" rows="3" placeholder="More details about the project, tech stack, etc."></textarea>
-            </div>
-            <div class="form-group mb-6">
-                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block;">Max Members</label>
+            <div class="form-group">
+                <label class="text-muted text-xs uppercase font-bold mb-2" style="display: block; letter-spacing: 0.05em;">Maximum Operatives</label>
                 <input type="number" name="max_members" class="glass-input" value="5" min="2" max="10">
             </div>
-            <div class="flex justify-end gap-3">
-                <button type="button" class="glass-btn" onclick="closeCreateGroupModal()">Cancel</button>
-                <button type="submit" class="glass-btn glass-btn-primary">Create Group</button>
+            <div class="flex justify-end gap-4 mt-4">
+                <button type="button" class="glass-btn" onclick="closeCreateGroupModal()">Abort</button>
+                <button type="submit" class="glass-btn glass-btn-primary">Inaugurate Group</button>
             </div>
         </form>
     </div>

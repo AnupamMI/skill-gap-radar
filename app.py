@@ -767,41 +767,14 @@ def compute_match(student_skills, required_skills):
     return score, list(overlap), list(missing)
 
 
-def generate_match_reason(student_skills, required_skills, match_score, api_key=None):
-    """Call LLM to generate match reason. Uses urllib, no anthropic SDK."""
-    if not api_key:
-        api_key = os.getenv("ANTHROPIC_API_KEY")
-    
+def generate_match_reason(student_skills, required_skills, match_score):
+    """Call LLM to generate match reason using the Groq client."""
     system_prompt = "You are a faculty assistant reviewing student-project fit. Write exactly one sentence (under 15 words) naming specific matching skills and explaining why this student fits. If match is weak, say so honestly."
     user_message = f"Student skills: {', '.join(student_skills)}. Project needs: {', '.join(required_skills)}. Match score: {match_score}%."
     
     try:
-        import urllib.request
-        import json
-        
-        payload = {
-            "model": "claude-3-haiku-20240307",
-            "max_tokens": 100,
-            "system": system_prompt,
-            "messages": [{"role": "user", "content": user_message}]
-        }
-        
-        headers = {
-            "Content-Type": "application/json",
-            "X-API-Key": api_key,
-            "anthropic-version": "2023-06-01"
-        }
-        
-        req = urllib.request.Request(
-            "https://api.anthropic.com/v1/messages",
-            data=json.dumps(payload).encode('utf-8'),
-            headers=headers,
-            method="POST"
-        )
-        
-        with urllib.request.urlopen(req, timeout=10) as response:
-            result = json.loads(response.read().decode('utf-8'))
-            return result["content"][0]["text"].strip()
+        response = call_groq(system_prompt, [{"role": "user", "content": user_message}])
+        return response.strip()
     except Exception as e:
         print(f"LLM reason generation failed: {e}")
         return "Skill overlap identified, reason unavailable"
