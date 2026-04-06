@@ -1,72 +1,148 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Skill Gap Radar{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    {% block head %}{% endblock %}
+    <!-- High-End Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="container flex justify-between items-center">
-            <a href="/" class="logo font-display text-gradient">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary)"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
-                Skill Gap Radar
-            </a>
-            <div class="flex items-center gap-4">
-                <button id="theme-toggle" class="btn btn-secondary" style="padding: 0.5rem; border-radius: 50%;" title="Toggle Theme">
-                    <svg id="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <!-- Default to Sun -->
-                        <circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                    </svg>
-                </button>
-                
-                {% if session.user_id %}
-                    <span class="text-muted" style="font-size: 0.9rem;">{{ session.name }}</span>
-                    <a href="/logout" class="btn btn-secondary">Logout</a>
-                {% else %}
-                    <a href="/login" class="btn btn-secondary">Login</a>
-                    <a href="/register" class="btn btn-primary">Get Started</a>
-                {% endif %}
-            </div>
+    {% set path = request.path %}
+    
+    {% if path == '/' %}
+        <!-- Marketing Landing (Simplified for now) -->
+        {% include 'navbar_marketing.html' %}
+        <div class="marketing-wrap">
+            {% block marketing_content %}{% endblock %}
         </div>
-    </nav>
-
-    {% block layout %}{% endblock %}
+    {% elif '/login' in path or '/register' in path %}
+        <!-- Auth Centered Pages -->
+        <div class="auth-wrapper">
+            {% block auth_content %}{% endblock %}
+        </div>
+    {% else %}
+        <!-- App Internal Dashboard -->
+        <div class="app-layout">
+            <aside class="sidebar">
+                {% include 'sidebar.html' %}
+            </aside>
+            
+            <main class="main-content">
+                <header class="dashboard-header flex justify-between mb-6">
+                    <div class="text-muted" style="font-size: 0.85rem;">
+                        <span class="text-accent">SaaS</span> / {{ active|capitalize }}
+                    </div>
+                    <div class="flex">
+                        <div class="badge" style="background: rgba(var(--accent-rgb), 0.1); border: 1px solid rgba(var(--accent-rgb), 0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; color: var(--accent); font-weight: 600;">
+                            Live Data Feed
+                        </div>
+                    </div>
+                </header>
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    {% endif %}
 
     <script>
-        // Theme toggling logic
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeIcon = document.getElementById('theme-icon');
-        const htmlEl = document.documentElement;
-        
-        // Check local storage or prefer color scheme
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            htmlEl.setAttribute('data-theme', savedTheme);
-        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-            htmlEl.setAttribute('data-theme', 'light');
+        // Init Lucide Icons
+        lucide.createIcons();
+    </script>
+
+    <!-- ── AI MENTOR CHAT UI ── -->
+    {% if 'user_id' in session %}
+    <div id="ai-chat-btn" onclick="toggleChat()">
+        <i data-lucide="bot" style="color: #000;"></i>
+    </div>
+
+    <div id="ai-chat-panel">
+        <div class="chat-header">
+            <h4 style="margin: 0; font-size: 1.1rem; color: #fff;" class="flex"><i data-lucide="cpu" style="width: 18px; margin-right: 8px;"></i> AI Mentor</h4>
+            <i data-lucide="x" style="cursor: pointer; color: var(--text-muted);" onclick="toggleChat()"></i>
+        </div>
+        <div class="chat-body" id="chat-messages">
+            <div class="chat-bubble bubble-ai">
+                Hello! I'm your continuous career mentor. How can I help you accelerate your roadmap today?
+            </div>
+            <div class="quick-prompts" id="quick-prompts">
+                <span class="quick-chip" onclick="sendChat('What should I learn next?')">What should I learn next?</span>
+                <span class="quick-chip" onclick="sendChat('Suggest a project for me')">Suggest a project for me</span>
+                <span class="quick-chip" onclick="sendChat('How do I improve my resume?')">How do I improve my resume?</span>
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chat-input" class="glass-input" placeholder="Ask about your skills..." onkeypress="handleChatEnter(event)" style="flex: 1; padding: 10px 14px; font-size: 0.85rem;">
+            <button class="glass-btn glass-btn-primary" onclick="sendChat()" style="padding: 10px 14px;"><i data-lucide="send" style="width: 16px;"></i></button>
+        </div>
+    </div>
+    
+    <script>
+        let chatHistory = [];
+
+        function toggleChat() {
+            const panel = document.getElementById('ai-chat-panel');
+            panel.classList.toggle('active');
         }
-        
-        updateIcon(htmlEl.getAttribute('data-theme'));
 
-        themeToggleBtn.addEventListener('click', () => {
-            let currentTheme = htmlEl.getAttribute('data-theme');
-            let targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            htmlEl.setAttribute('data-theme', targetTheme);
-            localStorage.setItem('theme', targetTheme);
-            updateIcon(targetTheme);
-        });
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') sendChat();
+        }
 
-        function updateIcon(theme) {
-            if (theme === 'dark') {
-                themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
-            } else {
-                themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
+        async function sendChat(forceMessage = null) {
+            const input = document.getElementById('chat-input');
+            const msg = forceMessage || input.value.trim();
+            if(!msg) return;
+
+            input.value = '';
+            
+            // Hide quick prompts as requested
+            const quickPrompts = document.getElementById('quick-prompts');
+            if(quickPrompts) quickPrompts.style.display = 'none';
+
+            // Push User bubble to DOM
+            const chatBody = document.getElementById('chat-messages');
+            chatBody.insertAdjacentHTML('beforeend', `<div class="chat-bubble bubble-user">${msg.replace(/</g, "&lt;")}</div>`);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // Push simulated typing DOM state
+            const typingId = 'typing-' + Date.now();
+            chatBody.insertAdjacentHTML('beforeend', `
+                <div class="chat-bubble bubble-ai typing-indicator" id="${typingId}">
+                    <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                </div>
+            `);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: msg, history: chatHistory })
+                });
+
+                document.getElementById(typingId).remove();
+
+                const data = await response.json();
+                
+                if (response.status === 400) {
+                    // Inject graceful strict error block as native chat frame inline
+                    chatBody.insertAdjacentHTML('beforeend', `<div class="chat-bubble bubble-error">${data.error}</div>`);
+                } else if(data.reply) {
+                    // Process line breaks natively allowing paragraph outputs
+                    const formattedReply = data.reply.replace(/\n/g, '<br>');
+                    chatBody.insertAdjacentHTML('beforeend', `<div class="chat-bubble bubble-ai">${formattedReply}</div>`);
+                    chatHistory.push({ sender: 'user', text: msg });
+                    chatHistory.push({ sender: 'assistant', text: data.reply });
+                }
+            } catch (err) {
+                document.getElementById(typingId)?.remove();
+                chatBody.insertAdjacentHTML('beforeend', `<div class="chat-bubble bubble-error">Network disconnection. Wait a moment and try again.</div>`);
             }
+            chatBody.scrollTop = chatBody.scrollHeight;
+            lucide.createIcons(); // refresh dynamically added icons if AI dictates code
         }
     </script>
+    {% endif %}
 </body>
 </html>

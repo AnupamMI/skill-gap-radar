@@ -136,17 +136,22 @@ def init_db():
     )
     """)
 
-    # Collaborative Learning tables
+    # Collaborative Learning tables - Phase 4 Enhanced
     cur.execute("""
     CREATE TABLE IF NOT EXISTS student_groups(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
+        name TEXT NOT NULL,
         project_title TEXT,
+        project_id INTEGER,
+        goal TEXT,
         description TEXT,
-        status TEXT DEFAULT 'Active',
+        status TEXT DEFAULT 'active', -- 'active', 'inactive', 'completed'
         leader_id INTEGER,
+        max_members INTEGER DEFAULT 5,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(leader_id) REFERENCES users(id)
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(leader_id) REFERENCES users(id),
+        FOREIGN KEY(project_id) REFERENCES projects(id)
     )
     """)
 
@@ -155,10 +160,59 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         group_id INTEGER,
         student_id INTEGER,
+        role TEXT DEFAULT 'member', -- 'leader', 'member'
         joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(group_id, student_id),
-        FOREIGN KEY(group_id) REFERENCES student_groups(id),
+        FOREIGN KEY(group_id) REFERENCES student_groups(id) ON DELETE CASCADE,
         FOREIGN KEY(student_id) REFERENCES users(id)
+    )
+    """)
+
+    # Group Invites system
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS group_invites(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        group_id INTEGER,
+        inviter_id INTEGER,
+        invitee_id INTEGER,
+        status TEXT DEFAULT 'pending', -- 'pending', 'accepted', 'rejected'
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(group_id) REFERENCES student_groups(id) ON DELETE CASCADE,
+        FOREIGN KEY(inviter_id) REFERENCES users(id),
+        FOREIGN KEY(invitee_id) REFERENCES users(id),
+        UNIQUE(group_id, invitee_id)
+    )
+    """)
+
+    # Group Join Requests (students requesting to join open groups)
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS group_join_requests(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        group_id INTEGER,
+        student_id INTEGER,
+        message TEXT,
+        status TEXT DEFAULT 'pending', -- 'pending', 'accepted', 'rejected'
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(group_id) REFERENCES student_groups(id) ON DELETE CASCADE,
+        FOREIGN KEY(student_id) REFERENCES users(id),
+        UNIQUE(group_id, student_id)
+    )
+    """)
+
+    # Teacher Group Evaluations (shortlist, high potential marks)
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS teacher_group_evaluations(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        group_id INTEGER,
+        teacher_id INTEGER,
+        is_shortlisted INTEGER DEFAULT 0,
+        is_high_potential INTEGER DEFAULT 0,
+        avg_match_score INTEGER,
+        notes TEXT,
+        evaluated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(group_id) REFERENCES student_groups(id) ON DELETE CASCADE,
+        FOREIGN KEY(teacher_id) REFERENCES users(id),
+        UNIQUE(group_id, teacher_id)
     )
     """)
 
@@ -166,9 +220,12 @@ def init_db():
     CREATE TABLE IF NOT EXISTS project_updates(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         group_id INTEGER,
+        student_id INTEGER,
         message TEXT,
+        update_type TEXT DEFAULT 'general', -- 'general', 'milestone', 'issue'
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(group_id) REFERENCES student_groups(id)
+        FOREIGN KEY(group_id) REFERENCES student_groups(id) ON DELETE CASCADE,
+        FOREIGN KEY(student_id) REFERENCES users(id)
     )
     """)
 
@@ -176,9 +233,59 @@ def init_db():
     CREATE TABLE IF NOT EXISTS student_availability(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER UNIQUE,
-        status TEXT DEFAULT 'Available',
+        status TEXT DEFAULT 'available', -- 'available', 'busy', 'open_to_collaborate'
+        looking_for TEXT, -- 'project', 'group', 'mentorship'
         last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+    """)
+
+    # Analytics: User analysis history for skill progress tracking
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS user_analysis_history(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        total_score INTEGER,
+        skill_breakdown TEXT, -- JSON: {"frontend": 70, "backend": 40, "dsa": 60, ...}
+        matched_skills TEXT, -- JSON array of matched skills
+        missing_skills TEXT, -- JSON array of missing skills
+        analysis_source TEXT, -- 'resume', 'github', 'combined'
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+    """)
+
+    # PROJECTS: faculty posted projects with required skills
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS projects(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        faculty_id INTEGER,
+        title TEXT NOT NULL,
+        description TEXT,
+        required_skills TEXT,
+        posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status TEXT DEFAULT 'open',
+        FOREIGN KEY(faculty_id) REFERENCES users(id)
+    )
+    """)
+
+    # APPLICATIONS: student applications to projects with match data
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS applications(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER,
+        student_id INTEGER,
+        student_name TEXT,
+        student_skills TEXT,
+        project_idea TEXT,
+        interest_statement TEXT,
+        match_score INTEGER DEFAULT 0,
+        match_reason TEXT,
+        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        status TEXT DEFAULT 'pending',
+        FOREIGN KEY(project_id) REFERENCES projects(id),
+        FOREIGN KEY(student_id) REFERENCES users(id),
+        UNIQUE(project_id, student_id)
     )
     """)
 

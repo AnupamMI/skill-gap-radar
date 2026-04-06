@@ -8,59 +8,75 @@ def get_db_connection():
     return conn
 
 def analyze_github_profile(username):
-    """Fetch user's top languages from GitHub API"""
-    url = f"https://api.github.com/users/{username}/repos?per_page=100"
-    response = requests.get(url)
+    """Fetch user's top languages from GitHub API with robust error handling"""
+    try:
+        url = f"https://api.github.com/users/{username}/repos?per_page=100"
+        response = requests.get(url, timeout=10)
 
-    if response.status_code != 200:
-        return []
+        if response.status_code == 404:
+            print(f"GitHub user not found: {username}")
+            return []
+        
+        if response.status_code == 403:
+            print(f"GitHub API Rate limit exceeded.")
+            return []
 
-    repos = response.json()
-    language_count = defaultdict(int)
-    detected_frameworks = set()
-    total_complexity = 0
-    
-    FRAMEWORK_KEYWORDS = ['react', 'flask', 'django', 'node', 'express', 'next', 'spring', 'pytorch', 'tensorflow', 'pandas']
-    
-    for repo in repos:
-        lang = repo.get("language")
-        if lang:
-            language_count[lang.lower()] += 1
+        if response.status_code != 200:
+            print(f"GitHub API error: {response.status_code}")
+            return []
+
+        repos = response.json()
+        if not isinstance(repos, list):
+            return []
+
+        language_count = defaultdict(int)
+        detected_frameworks = set()
+        total_complexity = 0
+        
+        FRAMEWORK_KEYWORDS = ['react', 'flask', 'django', 'node', 'express', 'next', 'spring', 'pytorch', 'tensorflow', 'pandas']
+        
+        for repo in repos:
+            lang = repo.get("language")
+            if lang:
+                language_count[lang.lower()] += 1
+                
+            # Complexity heuristics: size, has_wiki, stargazers
+            size = repo.get("size", 0)
+            stars = repo.get("stargazers_count", 0)
+            has_wiki = repo.get("has_wiki", False)
             
-        # Complexity heuristics: size, has_wiki, stargazers
-        size = repo.get("size", 0)
-        stars = repo.get("stargazers_count", 0)
-        has_wiki = repo.get("has_wiki", False)
-        
-        complexity_score = 0
-        if size > 1000: complexity_score += 1
-        if size > 10000: complexity_score += 2
-        if stars > 0: complexity_score += 1
-        if has_wiki: complexity_score += 1
-        total_complexity += complexity_score
-        
-        # Framework detection from description or topics
-        desc = (repo.get("description") or "").lower()
-        topics = repo.get("topics", [])
-        combined_text = desc + " " + " ".join(topics)
-        
-        for fw in FRAMEWORK_KEYWORDS:
-            if fw in combined_text:
-                detected_frameworks.add(fw)
+            complexity_score = 0
+            if size > 1000: complexity_score += 1
+            if size > 10000: complexity_score += 2
+            if stars > 0: complexity_score += 1
+            if has_wiki: complexity_score += 1
+            total_complexity += complexity_score
+            
+            # Framework detection from description or topics
+            desc = (repo.get("description") or "").lower()
+            topics = repo.get("topics", [])
+            combined_text = desc + " " + " ".join(topics)
+            
+            for fw in FRAMEWORK_KEYWORDS:
+                if fw in combined_text:
+                    detected_frameworks.add(fw)
 
-    langs = list(language_count.keys())
-    
-    # Assess overall quality/depth
-    avg_complexity = total_complexity / max(1, len(repos))
-    depth = "Beginner"
-    if avg_complexity >= 2: depth = "Intermediate"
-    if avg_complexity >= 4: depth = "Advanced"
+        langs = list(language_count.keys())
+        
+        # Assess overall quality/depth
+        avg_complexity = total_complexity / max(1, len(repos))
+        depth = "Beginner"
+        if avg_complexity >= 2: depth = "Intermediate"
+        if avg_complexity >= 4: depth = "Advanced"
 
-    return {
-        "languages": langs,
-        "frameworks": list(detected_frameworks),
-        "depth": depth
-    }
+        return {
+            "languages": langs,
+            "frameworks": list(detected_frameworks),
+            "depth": depth
+        }
+    except Exception as e:
+        print(f"CRITICAL ERROR in GitHub Analysis: {e}")
+        return []
 def verify_github_skills(user_id, github_username):
     """Verify skills based on GitHub languages and update user_skills table"""
     github_data = analyze_github_profile(github_username)

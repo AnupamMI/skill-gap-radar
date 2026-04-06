@@ -14,32 +14,49 @@ def get_db_connection():
 
 def extract_skills_from_pdf(pdf_path):
     """Extract skills from a resume PDF using Spacy PhraseMatcher"""
-    conn = get_db_connection()
-    db_skills = conn.execute("SELECT id, name FROM skills").fetchall()
-    conn.close()
-
-    skill_map = {s['name'].lower(): s['id'] for s in db_skills}
-    
-    # Build matcher
-    matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
-    patterns = [nlp.make_doc(name) for name in skill_map.keys()]
-    matcher.add("SKILLS", patterns)
-
     try:
+        if not os.path.exists(pdf_path):
+            print(f"File not found: {pdf_path}")
+            return []
+
+        conn = get_db_connection()
+        db_skills = conn.execute("SELECT id, name FROM skills").fetchall()
+        conn.close()
+
+        if not db_skills:
+            print("No skills found in database to match against.")
+            return []
+
+        skill_map = {s['name'].lower(): s['id'] for s in db_skills}
+        
+        # Build matcher
+        matcher = PhraseMatcher(nlp.vocab, attr="LOWER")
+        patterns = [nlp.make_doc(name) for name in skill_map.keys()]
+        matcher.add("SKILLS", patterns)
+
+        # Extract and clean text
         text = extract_text(pdf_path)
+        if not text:
+            print("PDF extraction returned empty text.")
+            return []
+
+        # Cleanup whitespace and normalize
+        text = " ".join(text.split())
         doc = nlp(text)
         matches = matcher(doc)
 
         found_skill_ids = set()
         for match_id, start, end in matches:
             span = doc[start:end]
-            skill_id = skill_map.get(span.text.lower())
+            skill_id = skill_map.get(span.text.lower().strip())
             if skill_id:
                 found_skill_ids.add(skill_id)
         
+        print(f"Extracted {len(found_skill_ids)} skills from {pdf_path}")
         return list(found_skill_ids)
+
     except Exception as e:
-        print(f"Error extracting skills: {e}")
+        print(f"CRITICAL ERROR in extract_skills: {e}")
         return []
 
 def calculate_skill_gap(user_id, goal_role):

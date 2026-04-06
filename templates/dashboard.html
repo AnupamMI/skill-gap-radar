@@ -1,315 +1,115 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Your Skill Gap Analysis - Skill Gap Radar</title>
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+{% extends "base.html" %}
 
-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #0A1F44 0%, #1A1A1A 100%);
-    min-height: 100vh;
-    padding: 40px 20px;
-    color: #FFFFFF;
-}
+{% block title %}Analysis Dashboard - Skill Gap Radar{% endblock %}
 
-.container {
-    max-width: 1000px;
-    margin: 0 auto;
-}
+{% set active = 'dashboard' %}
 
-.dashboard-header {
-    text-align: center;
-    margin-bottom: 40px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 50px 40px;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.dashboard-header h1 {
-    font-size: 36px;
-    margin-bottom: 12px;
-    background: linear-gradient(135deg, #FFFFFF 0%, #B8C6DB 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 800;
-    letter-spacing: -1px;
-}
-
-.dashboard-header p {
-    font-size: 15px;
-    color: #B8C6DB;
-    letter-spacing: 0.3px;
-}
-
-.back-btn {
-    display: inline-block;
-    margin-bottom: 20px;
-    color: #FFFFFF;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.back-btn:hover {
-    color: #B8C6DB;
-    text-decoration: underline;
-}
-
-.card {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 35px;
-    margin-bottom: 25px;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.card h2 {
-    color: #FFFFFF;
-    margin-bottom: 25px;
-    font-size: 24px;
-    padding-bottom: 15px;
-    border-bottom: 1.5px solid rgba(255, 255, 255, 0.2);
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
-
-.skill {
-    margin: 20px 0;
-    padding: 18px 20px;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.skill:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.skill-name {
-    font-weight: 600;
-    color: #FFFFFF;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    letter-spacing: 0.3px;
-}
-
-.teacher-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #0A1F44 0%, #36454F 100%);
-    color: white;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.bar {
-    height: 24px;
-    border-radius: 12px;
-    background: #ecf0f1;
-    overflow: hidden;
-    margin-bottom: 8px;
-}
-
-.fill {
-    height: 100%;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 12px;
-    font-weight: 600;
-    transition: width 0.5s ease;
-}
-
-.strong {
-    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-}
-
-.moderate {
-    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-}
-
-.missing {
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-}
-
-.score-text {
-    font-size: 13px;
-    color: #7f8c8d;
-    margin-top: 5px;
-}
-
-.project-item {
-    padding: 12px;
-    margin: 10px 0;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    color: white;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 500;
-    transition: all 0.3s;
-}
-
-.project-item:hover {
-    transform: translateX(5px);
-    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
-}
-
-.action-buttons {
-    display: flex;
-    gap: 12px;
-    margin-top: 30px;
-    flex-wrap: wrap;
-}
-
-.btn {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-primary {
-    background: #3498db;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #2980b9;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
-}
-
-.btn-secondary {
-    background: #95a5a6;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #7f8c8d;
-    transform: translateY(-2px);
-}
-
-@media (max-width: 768px) {
-    .card {
-        padding: 20px;
-    }
+{% block content %}
+<div class="animate-slide-up max-w-5xl mx-auto w-full">
     
-    .dashboard-header {
-        padding: 25px;
-    }
-    
-    .dashboard-header h1 {
-        font-size: 24px;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-    }
-    
-    .btn {
-        width: 100%;
-        text-align: center;
-    }
-}
-</style>
-</head>
-<body>
-
-<div class="container">
-    <a href="/" class="back-btn">← Back to Home</a>
-    
-    <div class="dashboard-header">
-        <h1>📊 Your Skill Gap Analysis</h1>
-        <p>Comprehensive assessment of your professional capabilities and development areas</p>
-    </div>
-
-    <div class="card">
-        <h2>Skill Strength Assessment</h2>
-        <p style="color: #7f8c8d; margin-bottom: 20px;">Your proficiency level in each skill based on resume, GitHub, and target role requirements</p>
-
-        {% for skill,score in scores.items() %}
-        <div class="skill">
-            <div class="skill-name">
-                <span>{{ skill|title }}</span>
-                {% if teacher and skill in teacher %}
-                    <span class="teacher-badge">
-                        Verified:
-                        {% if teacher[skill] == 5 %} Strong
-                        {% elif teacher[skill] == 3 %} Average
-                        {% else %} Weak
-                        {% endif %}
-                    </span>
-                {% endif %}
-            </div>
-            
-            <div class="bar">
-                <div class="fill {% if score >= 80 %}strong{% elif score >= 50 %}moderate{% else %}missing{% endif %}"
-                     style="width: {{ score }}%;">
-                    {{ score }}%
-                </div>
-            </div>
-            <div class="score-text">Proficiency Level: {{ score }}%</div>
+    <div class="flex justify-between align-start mb-8">
+        <div>
+            <h1 class="text-2xl mb-2">📊 Skill Analysis Report</h1>
+            <p class="text-muted">Comprehensive assessment of your professional capabilities and development areas.</p>
         </div>
-        {% endfor %}
+        <a href="/" class="glass-btn">
+            <i data-lucide="arrow-left" style="width: 16px;"></i> Return to Home
+        </a>
     </div>
 
-    <div class="card">
-        <h2>Development Areas</h2>
-        <p style="color: #7f8c8d; margin-bottom: 20px;">Skills that need improvement to match your target role requirements</p>
-        {% if missing %}
-            {% for s in missing %}
-            <div class="skill" style="background: #fff3cd; border-left: 4px solid #f39c12;">
-                <div class="skill-name">
-                    <span style="color: #856404;">{{ s|title }}</span>
+    <!-- Skill Strength Assessment -->
+    <div class="glass-card mb-6">
+        <div class="border-b pb-4 mb-6">
+            <h2 class="text-xl">Technical Proficiency</h2>
+            <p class="text-muted text-sm mt-2">Competency level based on resume vectorization, automated testing, and verification data.</p>
+        </div>
+
+        <div class="flex-col gap-6">
+            {% for skill, score in scores.items() %}
+            <div class="skill-row">
+                <div class="flex justify-between mb-2">
+                    <div class="flex gap-4">
+                        <span class="font-semibold text-lg">{{ skill|title }}</span>
+                        {% if teacher and skill in teacher %}
+                            <span class="badge" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; color: #10b981; display: flex; align-items: center; gap: 4px;">
+                                <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i>
+                                Verified: 
+                                {% if teacher[skill] == 5 %} Strong
+                                {% elif teacher[skill] == 3 %} Average
+                                {% else %} Weak
+                                {% endif %}
+                            </span>
+                        {% endif %}
+                    </div>
+                    <span class="text-muted text-sm font-semibold">{{ score }}%</span>
                 </div>
-                <p style="color: #856404; font-size: 13px;">Priority: Focus on developing this skill</p>
+                
+                <div class="progress-track">
+                    <div class="progress-fill {% if score >= 80 %}success{% elif score >= 50 %}warning{% else %}danger{% endif %}" 
+                         style="width: {{ score }}%;"></div>
+                </div>
             </div>
             {% endfor %}
-        {% else %}
-            <p style="color: #27ae60; font-weight: 600;">✓ Excellent! You have all critical skills for your target role.</p>
-        {% endif %}
+        </div>
     </div>
 
-    <div class="card">
-        <h2>Recommended Learning Path</h2>
-        <p style="color: #7f8c8d; margin-bottom: 20px;">Project-based learning recommendations to fill skill gaps</p>
-        {% for p in projects %}
-            <div class="project-item">
-                <span>🚀</span>
-                <span>{{ p }}</span>
+    <div class="grid grid-2 gap-6 mb-6" style="grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));">
+        <!-- Development Areas -->
+        <div class="glass-card">
+            <div class="border-b pb-4 mb-4">
+                <h2 class="text-xl flex gap-2"><i data-lucide="alert-triangle" class="text-accent" style="width: 20px;"></i> Core Priorities</h2>
+                <p class="text-muted text-sm mt-2">Critical skill gaps matching your target role.</p>
             </div>
-        {% endfor %}
+            
+            <div class="flex-col gap-4">
+            {% if missing %}
+                {% for s in missing %}
+                <div class="p-4 rounded-lg" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2);">
+                    <div class="flex gap-2">
+                        <i data-lucide="target" style="color: #ef4444; width: 16px;"></i>
+                        <span class="font-semibold text-sm" style="color: #f87171;">{{ s|title }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="p-4 rounded-lg flex gap-2 justify-center" style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <i data-lucide="shield-check" style="color: #10b981; width: 18px;"></i>
+                    <span style="color: #34d399; font-weight: 600; font-size: 0.9rem;">Excellent! No major gaps detected for this role.</span>
+                </div>
+            {% endif %}
+            </div>
+        </div>
+
+        <!-- Recommended Learning Path -->
+        <div class="glass-card">
+            <div class="border-b pb-4 mb-4">
+                <h2 class="text-xl flex gap-2"><i data-lucide="book-open" class="text-accent" style="width: 20px;"></i> Roadmap Projects</h2>
+                <p class="text-muted text-sm mt-2">Actionable project recommendations to bridge detected gaps.</p>
+            </div>
+
+            <div class="flex-col gap-4">
+            {% for p in projects %}
+                <div class="p-4 rounded-lg flex gap-3 align-start" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                    <i data-lucide="rocket" class="text-accent mt-1" style="width: 16px;"></i>
+                    <span class="text-sm font-semibold" style="line-height: 1.5;">{{ p }}</span>
+                </div>
+            {% endfor %}
+            {% if not projects %}
+                <p class="text-muted text-sm text-center py-4">No project recommendations needed at this time.</p>
+            {% endif %}
+            </div>
+        </div>
     </div>
 
-    <div class="action-buttons">
-        <a href="/" class="btn btn-primary">📊 Analyze Another Profile</a>
-        <a href="/history" class="btn btn-secondary">📈 View All Reports</a>
+    <!-- Actions -->
+    <div class="flex gap-4 mt-8">
+        <a href="/" class="glass-btn glass-btn-primary">
+            <i data-lucide="refresh-cw" style="width: 16px;"></i> Analyze New Profile
+        </a>
+        <a href="/history" class="glass-btn">
+            <i data-lucide="history" style="width: 16px;"></i> View Saved Reports
+        </a>
     </div>
+
 </div>
-
-</body>
-</html>
+{% endblock %}

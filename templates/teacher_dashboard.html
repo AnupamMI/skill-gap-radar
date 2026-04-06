@@ -1,171 +1,709 @@
 {% extends "base.html" %}
 
-{% block title %}Mentor Dashboard - Skill Gap Radar{% endblock %}
+{% block title %}
+    {{ active|capitalize }} - Mentor Dashboard
+{% endblock %}
 
-{% block layout %}
-<div class="app-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <a href="#" class="nav-link active" onclick="switchTab('tab-mentorship', this); return false;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            Mentorship
-        </a>
-        <a href="#" class="nav-link" onclick="switchTab('tab-groups', this); return false;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            Group Monitoring
-        </a>
-        <a href="#" class="nav-link" id="nav-discovery" onclick="switchTab('tab-discovery', this); return false;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            Discovery Network
-        </a>
-    </aside>
+{% block content %}
+<div class="dashboard">
+    <!-- Header -->
+    <div class="header">
+        <h1 style="font-family: 'Syne', sans-serif; font-size: 2.8rem; letter-spacing: -2px; margin-bottom: 8px;">
+            {% if active == 'dashboard' %}Project Management
+            {% elif active == 'requests' %}Student Applications
+            {% elif active == 'groups' %}Monitoring
+            {% elif active == 'discovery' %}Discovery
+            {% endif %}
+        </h1>
+        <p class="text-muted" style="max-width: 600px; font-size: 1.1rem;">
+            {% if active == 'dashboard' %}Manage your projects, review AI-matched students, and make admissions decisions.
+            {% elif active == 'requests' %}Review and manage student applications across all your projects.
+            {% elif active == 'groups' %}Real-time project telemetry and collaborative growth metrics.
+            {% elif active == 'discovery' %}Audit external engineering cohorts across the Skill Gap Radar platform.
+            {% endif %}
+        </p>
+    </div>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <div style="max-width: 1280px; margin: 0 auto; width: 100%;">
-            
-            <section id="tab-mentorship" class="app-section active">
-                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem;">
-                    <!-- Incoming Requests -->
-                    <div class="flex-col gap-6">
-                        <div class="card">
-                            <h2 class="mb-4 font-display flex items-center gap-2"><span class="text-secondary">●</span> Mentorship Requests</h2>
-                            <div id="requests-container" class="flex-col gap-4">
-                                <!-- Requests injected -->
-                                <p class="text-muted text-center mt-8 mb-8">Scanning for new students...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mentorship Chat -->
-                    <div class="flex-col gap-6">
-                        <div class="card" style="height: calc(100vh - 150px); display: flex; flex-direction: column;">
-                            <h2 class="mb-4 font-display flex items-center gap-2"><span class="text-primary">◆</span> Student Chats</h2>
-                            
-                            <div id="chat-box" style="flex: 1; overflow-y: auto; background: var(--bg-hover); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                                <p class="text-muted text-center" style="font-size: 0.85rem; margin-top: auto; margin-bottom: auto;">Select a student from your requests to start guiding them.</p>
-                            </div>
-                            
-                            <div class="flex gap-2">
-                                <input type="text" class="form-control" placeholder="Type your guidance..." id="msg-input" style="flex: 1;">
-                                <button class="btn btn-primary" onclick="sendMessage()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="tab-groups" class="app-section">
-                <h2 class="font-display mb-6 text-primary">Student Group Projects Monitor</h2>
-                
-                <div class="flex gap-4 mb-6">
-                    <select class="form-control" style="width: 200px;">
-                        <option>All Statuses</option>
-                        <option>Active</option>
-                        <option>Completed</option>
-                    </select>
-                </div>
-
-                <div id="monitoring-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 1.5rem;">
-                    <p class="text-muted">Loading group metrics...</p>
-                </div>
-            </section>
-
-            <!-- Discovery Tab -->
-            <section id="tab-discovery" class="app-section">
-                <div class="flex justify-between items-center mb-6">
-                    <div>
-                        <h2 class="font-display">Community Discovery</h2>
-                        <p class="text-muted">Find peers, see what they are building, and connect.</p>
-                    </div>
-                    
-                    <div class="flex gap-4">
-                        <input type="text" class="form-control" placeholder="Search skills, goals..." style="width: 250px;">
-                        <select class="form-control">
-                            <option value="all">All Goals</option>
-                            <option value="web">Web Developer</option>
-                            <option value="ml">ML Engineer</option>
-                            <option value="data">Data Scientist</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Groups Grid -->
-                <h3 class="font-display mb-4">Active Project Groups</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;" id="groups-grid">
-                    <!-- Data injected via JS -->
-                     <p class="text-muted">Loading groups...</p>
-                </div>
-
-                <!-- Discovery Grid -->
-                <h3 class="font-display mb-4">Students</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;" id="discovery-grid">
-                    <!-- Data injected via JS -->
-                    <p class="text-muted">Loading students...</p>
-                </div>
-            </section>
-
+    <!-- ── DASHBOARD (Projects & Matching) ── -->
+    {% if active == 'dashboard' %}
+    
+    <!-- Stats Row -->
+    <div class="stats-grid" id="dashboard-stats">
+        <div class="glass-card" style="border-bottom: 3px solid var(--accent);">
+            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.95rem; letter-spacing: 0.1em">Active Projects</div>
+            <h2 style="font-size: 2.5rem; color: var(--accent);" id="stat-projects">-</h2>
         </div>
-    </main>
+        <div class="glass-card" style="border-bottom: 3px solid #8b5cf6;">
+            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.95rem; letter-spacing: 0.1em">Total Applications</div>
+            <h2 style="font-size: 2.5rem;" id="stat-applications">-</h2>
+        </div>
+        <div class="glass-card" style="border-bottom: 3px solid #f59e0b;">
+            <div class="text-muted font-bold uppercase mb-2" style="font-size: 0.95rem; letter-spacing: 0.1em">Pending Review</div>
+            <h2 style="font-size: 2.5rem;" id="stat-pending">-</h2>
+        </div>
+    </div>
+
+    <!-- Create Project Section -->
+    <div class="glass-card mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="mb-0">Create New Project</h3>
+            <button class="glass-btn" onclick="toggleCreateForm()" id="create-btn">+ New Project</button>
+        </div>
+        <form id="create-project-form" style="display: none;" class="animate-slide-up">
+            <div class="grid grid-2 gap-4 mb-4">
+                <div class="form-group flex-col gap-2">
+                    <label class="text-muted uppercase text-sm font-bold">Project Title *</label>
+                    <input type="text" id="new-title" class="glass-input" placeholder="e.g., AI Resume Parser" required>
+                </div>
+                <div class="form-group flex-col gap-2">
+                    <label class="text-muted uppercase text-sm font-bold">Required Skills *</label>
+                    <input type="text" id="new-skills" class="glass-input" placeholder="Python, ML, Flask (comma-separated)" required>
+                </div>
+            </div>
+            <div class="form-group flex-col gap-2 mb-4">
+                <label class="text-muted uppercase text-sm font-bold">Description</label>
+                <textarea id="new-description" class="glass-input" rows="2" placeholder="Describe the project scope..."></textarea>
+            </div>
+            <div id="create-error" class="text-error mb-3" style="display: none;"></div>
+            <div id="create-success" class="text-success mb-3" style="display: none;"></div>
+            <div class="flex gap-2">
+                <button type="button" class="glass-btn" onclick="toggleCreateForm()">Cancel</button>
+                <button type="submit" class="glass-btn glass-btn-primary">Post Project</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Projects List -->
+    <div class="glass-card">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="mb-0">Your Projects</h3>
+            <button class="glass-btn" onclick="loadProjects()" title="Refresh">
+                <i data-lucide="refresh-cw" style="width: 16px;"></i>
+            </button>
+        </div>
+        <div id="projects-container">
+            <div class="flex justify-center py-12">
+                <div class="text-muted">Loading projects...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── REQUESTS (Applications View) ── -->
+    {% elif active == 'requests' %}
+    <div class="glass-card mb-6">
+        <h3 class="mb-2">All Applications</h3>
+        <p class="text-muted">Review and manage student applications across all your projects.</p>
+    </div>
+    <div id="all-applications-container">
+        <div class="flex justify-center py-12">
+            <div class="text-muted">Loading applications...</div>
+        </div>
+    </div>
+
+    <!-- ── MONITORING ── -->
+    {% elif active == 'groups' %}
+    <div class="main-section" style="grid-template-columns: 1fr;">
+        <div id="monitoring-grid" class="grid grid-auto gap-6">
+            <p class="text-muted">Synchronizing group metrics...</p>
+        </div>
+    </div>
+
+    <!-- ── DISCOVERY NETWORK ── -->
+    {% elif active == 'discovery' %}
+    <div class="flex-col gap-6">
+        <div class="glass-card mb-6">
+            <h3 class="mb-2">Network Discovery</h3>
+            <p class="text-muted">Audit external engineering cohorts across the Skill Gap Radar platform.</p>
+        </div>
+        <div id="discovery-grid" class="grid grid-auto gap-6 mt-4">
+            <p class="text-muted">Interfacing with available engineering networks...</p>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <script>
-    let currentStudentId = null;
+    // Global state
+    let projectsData = [];
 
-    function switchTab(tabId, navElement) {
-        document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.sidebar .nav-link').forEach(n => n.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        if (navElement) navElement.classList.add('active');
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
         
-        if(tabId === 'tab-groups') {
-            fetchGroupsMonitoring();
-        }
-        
-        if (tabId === 'tab-discovery') {
-            fetchDiscoveryData();
+        {% if active == 'dashboard' %}
+            loadProjects();
+            loadDashboardStats();
+        {% elif active == 'requests' %}
+            loadAllApplications();
+        {% elif active == 'groups' %}
+            loadMonitoringData();
+        {% elif active == 'discovery' %}
+            loadDiscovery();
+        {% endif %}
+    });
+
+    // ============ DASHBOARD FUNCTIONS ============
+
+    async function loadDashboardStats() {
+        try {
+            console.log('[Dashboard] Loading stats...');
+            
+            // Get projects count
+            const projectsRes = await fetch('/faculty/projects');
+            const projects = await projectsRes.json();
+            const projectCount = Array.isArray(projects) ? projects.length : 0;
+            
+            // Get total applications and pending count across all projects
+            let totalApps = 0;
+            let pendingApps = 0;
+            
+            if (Array.isArray(projects)) {
+                for (const project of projects) {
+                    try {
+                        const appsRes = await fetch(`/faculty/applications/${project.id}`);
+                        const apps = await appsRes.json();
+                        if (Array.isArray(apps)) {
+                            totalApps += apps.length;
+                            pendingApps += apps.filter(a => a.status === 'pending').length;
+                        }
+                    } catch (e) {
+                        console.error(`[Dashboard] Error loading apps for project ${project.id}:`, e);
+                    }
+                }
+            }
+            
+            // Update stats
+            document.getElementById('stat-projects').textContent = projectCount;
+            document.getElementById('stat-applications').textContent = totalApps;
+            document.getElementById('stat-pending').textContent = pendingApps;
+            
+            console.log('[Dashboard] Stats loaded:', { projects: projectCount, applications: totalApps, pending: pendingApps });
+        } catch (error) {
+            console.error('[Dashboard] Error loading stats:', error);
         }
     }
 
-    async function fetchGroupsMonitoring() {
+    async function loadProjects() {
+        const container = document.getElementById('projects-container');
+        container.innerHTML = '<div class="flex justify-center py-12"><div class="text-muted">Loading projects...</div></div>';
+        
+        try {
+            console.log('[Projects] Fetching from /faculty/projects...');
+            const res = await fetch('/faculty/projects');
+            
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+            
+            const projects = await res.json();
+            console.log('[Projects] API response:', projects);
+            
+            projectsData = Array.isArray(projects) ? projects : [];
+            
+            if (projectsData.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <i data-lucide="folder-open" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <p class="text-muted mb-4">No projects yet. Create one to begin.</p>
+                        <button class="glass-btn glass-btn-primary" onclick="toggleCreateForm()">Create First Project</button>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            container.innerHTML = projectsData.map(p => `
+                <div class="project-card mb-4" id="project-card-${p.id}">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 style="font-size: 1.2rem; margin-bottom: 4px;">${escapeHtml(p.title)}</h4>
+                            <p class="text-muted" style="font-size: 0.85rem;">${escapeHtml(p.description || 'No description')}</p>
+                        </div>
+                        <span class="text-muted" style="font-size: 0.75rem;">${new Date(p.posted_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="mb-3">
+                        ${p.required_skills.map(s => `<span class="skill-badge required">${escapeHtml(s)}</span>`).join('')}
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="glass-btn glass-btn-primary" onclick="toggleMatches(${p.id})">
+                            <i data-lucide="users" style="width: 16px; margin-right: 6px;"></i>
+                            View Matches
+                        </button>
+                        <button class="glass-btn" onclick="toggleApplications(${p.id})">
+                            <i data-lucide="file-text" style="width: 16px; margin-right: 6px;"></i>
+                            Applications
+                        </button>
+                    </div>
+                    
+                    <!-- Inline Matches Section -->
+                    <div id="matches-section-${p.id}" class="matches-section" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div class="flex justify-between items-center mb-3">
+                            <h5 class="text-accent">AI-Matched Students (Top 5)</h5>
+                            <button class="glass-btn" style="padding: 6px 12px; font-size: 0.75rem;" onclick="loadMatches(${p.id})">Refresh</button>
+                        </div>
+                        <div id="matches-content-${p.id}">
+                            <p class="text-muted">Click "View Matches" to see AI-ranked students...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Inline Applications Section -->
+                    <div id="applications-section-${p.id}" class="applications-section" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <div class="flex justify-between items-center mb-3">
+                            <h5 class="text-accent">Applications</h5>
+                            <button class="glass-btn" style="padding: 6px 12px; font-size: 0.75rem;" onclick="loadApplications(${p.id})">Refresh</button>
+                        </div>
+                        <div id="applications-content-${p.id}">
+                            <p class="text-muted">Loading applications...</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            lucide.createIcons();
+            
+            // Reload stats after projects load
+            loadDashboardStats();
+            
+        } catch (error) {
+            console.error('[Projects] Error:', error);
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <i data-lucide="alert-circle" style="width: 48px; height: 48px; color: #f87171; margin-bottom: 16px;"></i>
+                    <p class="text-error">Failed to load projects: ${error.message}</p>
+                    <button class="glass-btn mt-4" onclick="loadProjects()">Try Again</button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+    }
+
+    async function toggleMatches(projectId) {
+        const section = document.getElementById(`matches-section-${projectId}`);
+        const isVisible = section.style.display === 'block';
+        
+        // Hide all other sections
+        document.querySelectorAll('.matches-section, .applications-section').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        if (!isVisible) {
+            section.style.display = 'block';
+            await loadMatches(projectId);
+        }
+    }
+
+    async function loadMatches(projectId) {
+        const content = document.getElementById(`matches-content-${projectId}`);
+        content.innerHTML = '<p class="text-muted">Loading AI matches...</p>';
+        
+        try {
+            console.log(`[Matches] Fetching for project ${projectId}...`);
+            const res = await fetch(`/faculty/matches/${projectId}`);
+            
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+            
+            const matches = await res.json();
+            console.log('[Matches] API response:', matches);
+            
+            if (!Array.isArray(matches) || matches.length === 0) {
+                content.innerHTML = '<p class="text-muted">No matching students found yet. Students will appear here once they apply.</p>';
+                return;
+            }
+            
+            content.innerHTML = `
+                <div class="matches-grid">
+                    ${matches.map((m, index) => `
+                        <div class="student-match-card" style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 16px;">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span style="font-size: 1.2rem; font-weight: bold; color: ${index < 3 ? '#4ade80' : 'var(--text-muted)'};">#${index + 1}</span>
+                                    <h6 style="font-size: 1rem; margin: 0;">${escapeHtml(m.student_name)}</h6>
+                                </div>
+                                <span class="match-score" style="color: ${m.match_score >= 70 ? '#4ade80' : m.match_score >= 40 ? '#fbbf24' : '#f87171'};">${m.match_score}%</span>
+                            </div>
+                            <p class="match-reason mb-3" style="font-style: italic; font-size: 0.8rem; color: var(--text-muted);">
+                                "${escapeHtml(m.match_reason)}"
+                            </p>
+                            <div class="mb-2">
+                                <span class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; font-weight: bold;">Matched:</span>
+                                <div style="margin-top: 4px;">
+                                    ${m.matched_skills.length > 0 ? m.matched_skills.map(s => `<span class="skill-badge matched">${escapeHtml(s)}</span>`).join('') : '<span class="text-muted" style="font-size: 0.75rem;">None</span>'}
+                                </div>
+                            </div>
+                            <div>
+                                <span class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; font-weight: bold;">Missing:</span>
+                                <div style="margin-top: 4px;">
+                                    ${m.missing_skills.length > 0 ? m.missing_skills.map(s => `<span class="skill-badge missing">${escapeHtml(s)}</span>`).join('') : '<span class="text-muted" style="font-size: 0.75rem;">None</span>'}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } catch (error) {
+            console.error('[Matches] Error:', error);
+            content.innerHTML = `<p class="text-error">Error loading matches: ${error.message}</p>`;
+        }
+    }
+
+    async function toggleApplications(projectId) {
+        const section = document.getElementById(`applications-section-${projectId}`);
+        const isVisible = section.style.display === 'block';
+        
+        // Hide all other sections
+        document.querySelectorAll('.matches-section, .applications-section').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        if (!isVisible) {
+            section.style.display = 'block';
+            await loadApplications(projectId);
+        }
+    }
+
+    async function loadApplications(projectId) {
+        const content = document.getElementById(`applications-content-${projectId}`);
+        content.innerHTML = '<p class="text-muted">Loading applications...</p>';
+        
+        try {
+            console.log(`[Applications] Fetching for project ${projectId}...`);
+            const res = await fetch(`/faculty/applications/${projectId}`);
+            
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+            
+            const apps = await res.json();
+            console.log('[Applications] API response:', apps);
+            
+            if (!Array.isArray(apps) || apps.length === 0) {
+                content.innerHTML = '<p class="text-muted">No applications yet. Students will appear here once they apply.</p>';
+                return;
+            }
+            
+            content.innerHTML = `
+                <div class="applications-list">
+                    ${apps.map((app, index) => `
+                        <div class="application-card" style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 16px; margin-bottom: 12px;" id="app-card-${app.application_id}">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-3">
+                                    <span style="font-size: 1.1rem; font-weight: bold; color: ${index < 3 ? '#4ade80' : 'var(--text-muted)'};">#${index + 1}</span>
+                                    <div>
+                                        <h6 style="font-size: 1rem; margin: 0;">${escapeHtml(app.student_name)}</h6>
+                                        <span class="match-reason" style="font-size: 0.75rem;">${escapeHtml(app.match_reason)}</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="match-score mb-1" style="font-size: 1.3rem; color: ${app.match_score >= 70 ? '#4ade80' : app.match_score >= 40 ? '#fbbf24' : '#f87171'};">${app.match_score}%</div>
+                                    <span class="status-badge ${app.status}">${app.status}</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <span class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; font-weight: bold;">Skills Match:</span>
+                                <div style="margin-top: 4px;">
+                                    ${app.matched_skills.length > 0 ? app.matched_skills.map(s => `<span class="skill-badge matched">${escapeHtml(s)}</span>`).join('') : '<span class="text-muted" style="font-size: 0.75rem;">None</span>'}
+                                </div>
+                            </div>
+                            ${app.project_idea ? `
+                                <div class="mb-2" style="background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 6px;">
+                                    <span class="text-muted" style="font-size: 0.7rem; text-transform: uppercase; font-weight: bold;">Project Idea:</span>
+                                    <p style="font-size: 0.85rem; margin: 4px 0 0 0;">${escapeHtml(app.project_idea)}</p>
+                                </div>
+                            ` : ''}
+                            ${app.status === 'pending' ? `
+                                <div class="flex gap-2 mt-3">
+                                    <button class="glass-btn glass-btn-primary" style="font-size: 0.75rem; padding: 8px 16px;" onclick="updateApplicationStatus(${app.application_id}, 'accepted', ${projectId})">Accept</button>
+                                    <button class="glass-btn" style="font-size: 0.75rem; padding: 8px 16px; background: rgba(248, 113, 113, 0.1); color: #f87171; border-color: rgba(248, 113, 113, 0.3);" onclick="updateApplicationStatus(${app.application_id}, 'rejected', ${projectId})">Reject</button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } catch (error) {
+            console.error('[Applications] Error:', error);
+            content.innerHTML = `<p class="text-error">Error loading applications: ${error.message}</p>`;
+        }
+    }
+
+    async function updateApplicationStatus(applicationId, status, projectId) {
+        try {
+            console.log(`[Application] Updating ${applicationId} to ${status}...`);
+            const res = await fetch(`/faculty/applications/${applicationId}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+            }
+            
+            const result = await res.json();
+            console.log('[Application] Update result:', result);
+            
+            // Reload applications for this project
+            await loadApplications(projectId);
+            // Reload dashboard stats
+            await loadDashboardStats();
+            
+        } catch (error) {
+            console.error('[Application] Error updating status:', error);
+            alert('Failed to update status: ' + error.message);
+        }
+    }
+
+    // ============ CREATE PROJECT ============
+
+    function toggleCreateForm() {
+        const form = document.getElementById('create-project-form');
+        const btn = document.getElementById('create-btn');
+        
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+            btn.textContent = 'Cancel';
+        } else {
+            form.style.display = 'none';
+            btn.textContent = '+ New Project';
+            // Clear errors
+            document.getElementById('create-error').style.display = 'none';
+            document.getElementById('create-success').style.display = 'none';
+        }
+    }
+
+    document.getElementById('create-project-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const title = document.getElementById('new-title').value.trim();
+        const description = document.getElementById('new-description').value.trim();
+        const skillsInput = document.getElementById('new-skills').value.trim();
+        const required_skills = skillsInput.split(',').map(s => s.trim()).filter(s => s);
+        
+        const errorDiv = document.getElementById('create-error');
+        const successDiv = document.getElementById('create-success');
+        
+        errorDiv.style.display = 'none';
+        successDiv.style.display = 'none';
+        
+        if (required_skills.length < 2) {
+            errorDiv.textContent = 'Please provide at least 2 required skills';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        try {
+            console.log('[Create] Posting project:', { title, description, required_skills });
+            const res = await fetch('/faculty/post-project', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description, required_skills })
+            });
+            
+            const data = await res.json();
+            
+            if (!res.ok) {
+                throw new Error(data.error || `HTTP ${res.status}`);
+            }
+            
+            console.log('[Create] Success:', data);
+            successDiv.textContent = `Project "${data.title}" created successfully!`;
+            successDiv.style.display = 'block';
+            
+            // Reset form and hide
+            document.getElementById('create-project-form').reset();
+            setTimeout(() => {
+                toggleCreateForm();
+                loadProjects();
+            }, 1500);
+            
+        } catch (error) {
+            console.error('[Create] Error:', error);
+            errorDiv.textContent = error.message;
+            errorDiv.style.display = 'block';
+        }
+    });
+
+    // ============ REQUESTS PAGE (ALL APPLICATIONS) ============
+
+    async function loadAllApplications() {
+        const container = document.getElementById('all-applications-container');
+        container.innerHTML = '<div class="flex justify-center py-12"><div class="text-muted">Loading all applications...</div></div>';
+        
+        try {
+            // First get all projects
+            const projectsRes = await fetch('/faculty/projects');
+            const projects = await projectsRes.json();
+            
+            if (!Array.isArray(projects) || projects.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-card text-center py-12">
+                        <i data-lucide="inbox" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <p class="text-muted">No projects found. Create a project to receive applications.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            // Fetch applications for each project
+            let allApps = [];
+            for (const project of projects) {
+                try {
+                    const appsRes = await fetch(`/faculty/applications/${project.id}`);
+                    const apps = await appsRes.json();
+                    if (Array.isArray(apps)) {
+                        apps.forEach(app => {
+                            allApps.push({ ...app, project_title: project.title, project_id: project.id });
+                        });
+                    }
+                } catch (e) {
+                    console.error(`[AllApps] Error loading apps for project ${project.id}:`, e);
+                }
+            }
+            
+            // Sort by match score
+            allApps.sort((a, b) => b.match_score - a.match_score);
+            
+            if (allApps.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-card text-center py-12">
+                        <i data-lucide="inbox" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <p class="text-muted">No applications received yet.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="applications-table-wrapper glass-card">
+                    <table class="applications-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Student</th>
+                                <th>Project</th>
+                                <th>Match</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${allApps.map((app, index) => `
+                                <tr id="all-apps-row-${app.application_id}">
+                                    <td style="font-weight: bold; color: ${index < 3 ? '#4ade80' : 'var(--text-muted)'};">#${index + 1}</td>
+                                    <td style="font-weight: 600;">${escapeHtml(app.student_name)}</td>
+                                    <td style="font-size: 0.85rem;">${escapeHtml(app.project_title)}</td>
+                                    <td>
+                                        <span style="font-weight: bold; color: ${app.match_score >= 70 ? '#4ade80' : app.match_score >= 40 ? '#fbbf24' : '#f87171'};">${app.match_score}%</span>
+                                    </td>
+                                    <td style="font-size: 0.8rem; max-width: 200px; font-style: italic; color: var(--text-muted);">${escapeHtml(app.match_reason)}</td>
+                                    <td><span class="status-badge ${app.status}">${app.status}</span></td>
+                                    <td>
+                                        ${app.status === 'pending' ? `
+                                            <div class="flex gap-2">
+                                                <button class="glass-btn glass-btn-primary" style="font-size: 0.7rem; padding: 6px 12px;" onclick="updateAllAppsStatus(${app.application_id}, 'accepted')">Accept</button>
+                                                <button class="glass-btn" style="font-size: 0.7rem; padding: 6px 12px; background: rgba(248, 113, 113, 0.1); color: #f87171; border-color: rgba(248, 113, 113, 0.3);" onclick="updateAllAppsStatus(${app.application_id}, 'rejected')">Reject</button>
+                                            </div>
+                                        ` : '<span style="font-size: 0.75rem; color: var(--text-muted);">Reviewed</span>'}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            lucide.createIcons();
+            
+        } catch (error) {
+            console.error('[AllApps] Error:', error);
+            container.innerHTML = `
+                <div class="glass-card text-center py-12">
+                    <i data-lucide="alert-circle" style="width: 48px; height: 48px; color: #f87171; margin-bottom: 16px;"></i>
+                    <p class="text-error">Failed to load applications: ${error.message}</p>
+                    <button class="glass-btn mt-4" onclick="loadAllApplications()">Try Again</button>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+    }
+
+    async function updateAllAppsStatus(applicationId, status) {
+        try {
+            const res = await fetch(`/faculty/applications/${applicationId}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            
+            if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+            }
+            
+            // Reload the table
+            await loadAllApplications();
+            
+        } catch (error) {
+            console.error('[AllApps] Error updating status:', error);
+            alert('Failed to update status: ' + error.message);
+        }
+    }
+
+    // ============ LEGACY FUNCTIONS (for groups/discovery) ============
+
+    async function loadMonitoringData() {
         const res = await fetch('/get_groups');
         const data = await res.json();
-        
         const grid = document.getElementById('monitoring-grid');
+        grid.innerHTML = data.groups.map(g => `
+            <div class="glass-card">
+                <div class="flex justify-between mb-4">
+                    <h4 class="text-accent font-bold">${escapeHtml(g.name)}</h4>
+                    <span class="text-muted uppercase" style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em; border: 1px solid rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 20px;">${g.status}</span>
+                </div>
+                <p class="mb-6" style="font-size: 0.9rem; font-weight: 500;">${escapeHtml(g.project_title)}</p>
+                <div class="mb-8">
+                    <p class="text-muted uppercase text-xs mb-3 font-bold" style="letter-spacing:0.1em;">Team Matrix</p>
+                    <div class="flex" style="flex-wrap: wrap; gap: 8px;">
+                        ${g.members.map(m => `
+                            <span style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; font-size: 0.95rem; font-weight:600; color: #fff;">${escapeHtml(m.name)}</span>
+                        `).join('')}
+                    </div>
+                </div>
+                <button class="glass-btn glass-btn-primary w-full" style="font-size:0.8rem;">Evaluate Production</button>
+            </div>
+        `).join('') || '<div class="glass-card text-center py-12" style="grid-column: 1/-1;"><p class="text-muted">No active cohorts detected.</p></div>';
+        lucide.createIcons();
+    }
+
+    async function loadDiscovery() {
+        const res = await fetch('/get_groups');
+        const data = await res.json();
+        const grid = document.getElementById('discovery-grid');
         grid.innerHTML = '';
         
-        if(data.groups.length === 0) {
-            grid.innerHTML = '<p class="text-muted">No student groups created yet.</p>';
+        if (data.groups.length === 0) {
+            grid.innerHTML = '<div class="glass-card w-full text-center py-6" style="grid-column: 1/-1;"><p class="text-muted">No external cohorts detected on the network.</p></div>';
             return;
         }
 
         data.groups.forEach(g => {
-            const members = g.members.map(m => `<span class="badge" style="background:var(--bg-main); border:1px solid var(--border); color:var(--text-muted);">${m.name}</span>`).join('');
-            
-            let updatesHtml = '<p class="text-muted text-sm">No updates posted.</p>';
-            if(g.updates && g.updates.length > 0) {
-                updatesHtml = g.updates.map(u => `<div class="text-sm font-medium mb-1"><span class="text-secondary">●</span> ${u.message}</div>`).join('');
-            }
-            
+            const members = g.members.map(m => `<span class="badge" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 6px; font-size: 0.95rem; font-weight:600; color: #fff;">${escapeHtml(m.name)}</span>`).join('');
             grid.innerHTML += `
-                <div class="card hover:shadow-md" style="border-top: 3px solid ${g.status === 'Completed' ? 'var(--success)' : 'var(--primary)'}; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s;">
+                <div class="glass-card flex-col flex justify-between" style="border-top: 3px solid #8b5cf6;">
                     <div>
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <h3 class="font-display text-main" style="font-size: 1.3rem;">${g.name}</h3>
-                                <div class="text-primary font-bold" style="font-size: 0.95rem; margin-top: 0.3rem;">${g.project_title}</div>
+                                <h4 style="font-size: 1.1rem; margin-bottom: 4px;">${escapeHtml(g.name)}</h4>
+                                <p class="text-accent text-sm font-bold">${escapeHtml(g.project_title)}</p>
                             </div>
-                            <div class="badge badge-primary">${g.status}</div>
                         </div>
-                        
-                        <div class="mt-4 mb-6">
-                            <div class="text-xs text-muted mb-3 uppercase font-bold" style="letter-spacing: 0.05em;">Team Members</div>
-                            <div class="flex gap-2 flex-wrap">${members}</div>
-                        </div>
-                        
-                        <div class="mt-4 mb-2 p-4" style="background: var(--bg-hover); border-radius: var(--radius-sm); border: 1px solid var(--border);">
-                            <div class="text-xs text-muted mb-3 uppercase font-bold" style="letter-spacing: 0.05em;">Latest Updates</div>
-                            <div class="flex-col gap-2">${updatesHtml}</div>
+                        <p class="mb-6 text-muted text-sm">${escapeHtml(g.description || 'General engineering project framework.')}</p>
+                        <div class="mb-6">
+                            <p class="text-muted text-xs uppercase font-bold mb-2">Team Formation</p>
+                            <div class="flex" style="flex-wrap: wrap; gap: 8px;">${members}</div>
                         </div>
                     </div>
                 </div>
@@ -173,153 +711,12 @@
         });
     }
 
-    async function loadRequests() {
-        const res = await fetch('/get_incoming_requests');
-        const data = await res.json();
-        
-        const container = document.getElementById('requests-container');
-        if (data.requests.length === 0) {
-            container.innerHTML = '<p class="text-muted text-center mt-8 mb-8" style="font-size:0.9rem;">No pending requests at the moment.</p>';
-            return;
-        }
-
-        container.innerHTML = '';
-        data.requests.forEach(req => {
-            container.innerHTML += `
-                <div style="background: var(--bg-hover); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.5rem; transition: border-color 0.2s;">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="font-display text-main" style="font-size: 1.1rem; font-weight: 600;">${req.student_name}</div>
-                        <span class="badge badge-primary">${req.goal_role}</span>
-                    </div>
-                    
-                    <p style="font-size: 0.9rem; margin-bottom: 1rem; line-height: 1.5;">
-                        <strong class="text-muted" style="text-transform:uppercase; font-size: 0.75rem;">Idea / Need</strong><br/>
-                        ${req.project_idea}
-                    </p>
-                    
-                    <div class="flex gap-4">
-                        <button class="btn btn-primary" onclick="acceptStudent(${req.id})">Accept Student</button>
-                        <button class="btn btn-secondary" onclick="viewAnalysis(${req.id})">View Skill Gaps</button>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    async function acceptStudent(reqId) {
-        const formData = new FormData();
-        formData.append('request_id', reqId);
-        await fetch('/accept_request', { method: 'POST', body: formData });
-        loadRequests();
-    }
-
-    function viewAnalysis(studentId) {
-        alert("Redirecting to detailed skill gap report for student ID: " + studentId);
-    }
-
-    function sendMessage() {
-        const msg = document.getElementById('msg-input').value;
-        if (!msg) return;
-        
-        const box = document.getElementById('chat-box');
-        // Clear intro text if needed
-        if(box.innerHTML.includes('Select a student')) box.innerHTML = '';
-        
-        box.innerHTML += `
-            <div style="align-self: flex-end; background: var(--primary); color: white; padding: 0.5rem 1rem; border-radius: var(--radius-sm); border-bottom-right-radius: 0; max-width: 80%;">
-                ${msg}
-            </div>
-        `;
-        document.getElementById('msg-input').value = '';
-        box.scrollTop = box.scrollHeight;
-    }
-
-    loadRequests();
-    setInterval(loadRequests, 5000);
-
-    // ---------------- DISCOVERY ----------------
-    async function fetchDiscoveryData() {
-        const [studRes, grpRes] = await Promise.all([
-            fetch('/get_students'),
-            fetch('/get_groups')
-        ]);
-        
-        const studData = await studRes.json();
-        const grpData = await grpRes.json();
-
-        renderStudents(studData.students || []);
-        renderGroups(grpData.groups || []);
-    }
-
-    function renderStudents(students) {
-        const grid = document.getElementById('discovery-grid');
-        grid.innerHTML = '';
-        
-        if(students.length === 0) {
-            grid.innerHTML = '<p class="text-muted">No students found.</p>';
-            return;
-        }
-
-        students.forEach(st => {
-            const availColor = st.availability === 'Available' ? 'var(--success)' : 'var(--warning)';
-            
-            grid.innerHTML += `
-                <div class="card" style="display:flex; flex-direction:column; justify-content:space-between; transition: transform 0.2s;">
-                    <div>
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <h3 class="font-display text-main" style="font-size: 1.1rem;">${st.name}</h3>
-                                <div class="text-secondary" style="font-size: 0.85rem; font-weight: 500;">Role: Student</div>
-                            </div>
-                            <div class="text-xs" style="color: ${availColor}; font-weight: 600; border: 1px solid ${availColor}; padding: 0.2rem 0.5rem; border-radius: 4px;">
-                                ${st.availability}
-                            </div>
-                        </div>
-                        
-                        <p class="text-muted text-sm mb-4">${st.bio || 'Driven learner looking to collaborate.'}</p>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    function renderGroups(groups) {
-        const grid = document.getElementById('groups-grid');
-        grid.innerHTML = '';
-        
-        if(groups.length === 0) {
-            grid.innerHTML = '<p class="text-muted">No public groups found.</p>';
-            return;
-        }
-
-        groups.forEach(g => {
-            let statusColor = 'var(--primary)';
-            if(g.status === 'Completed') statusColor = 'var(--success)';
-            
-            const members = g.members.map(m => m.name).join(', ') || 'None';
-
-            grid.innerHTML += `
-                <div class="card" style="background: var(--bg-hover); display:flex; flex-direction:column; justify-content:space-between; transition: transform 0.2s;">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <h3 class="font-display text-main" style="font-size: 1.1rem;">${g.name}</h3>
-                                <div class="text-primary font-bold" style="font-size: 0.85rem;">Project: ${g.project_title}</div>
-                            </div>
-                            <div class="badge badge-primary" style="background: ${statusColor}20; color: ${statusColor};">
-                                ${g.status}
-                            </div>
-                        </div>
-                        
-                        <p class="text-muted text-sm mb-4" style="min-height: 2.5rem;">${g.description || 'No description provided.'}</p>
-                        
-                        <div class="text-xs text-muted mb-4">
-                            <strong style="text-transform: uppercase;">Team:</strong> ${members}
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
+    // Utility
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 </script>
 {% endblock %}
