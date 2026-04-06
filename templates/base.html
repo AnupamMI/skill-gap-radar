@@ -12,24 +12,35 @@
     {% set path = request.path %}
     
     {% if path == '/' %}
-        <!-- Marketing Landing (Simplified for now) -->
+        <!-- Marketing Landing -->
         {% include 'navbar_marketing.html' %}
         <div class="marketing-wrap">
             {% block marketing_content %}{% endblock %}
         </div>
+
     {% elif '/login' in path or '/register' in path %}
         <!-- Auth Centered Pages -->
         <div class="auth-wrapper">
             {% block auth_content %}{% endblock %}
         </div>
+
     {% else %}
         <!-- App Internal Dashboard -->
+
+        <!-- ① Mobile sidebar overlay (tap to close) -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+        <!-- ② Sticky hamburger toggle (mobile only) -->
+        <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle navigation" aria-expanded="false">
+            <i data-lucide="menu"></i>
+        </button>
+
         <div class="app-layout">
-            <aside class="sidebar">
+            <aside class="sidebar" id="sidebar">
                 {% include 'sidebar.html' %}
             </aside>
-            
-            <main class="main-content">
+
+            <main class="main-content" id="main-content">
                 <header class="dashboard-header flex justify-between mb-6">
                     <div class="text-muted" style="font-size: 0.85rem;">
                         <span class="text-accent">SaaS</span> / {{ active|capitalize }}
@@ -50,6 +61,52 @@
         lucide.createIcons();
     </script>
 
+    <!-- ── SIDEBAR TOGGLE (minimal vanilla JS) ── -->
+    {% if '/login' not in request.path and '/register' not in request.path and request.path != '/' %}
+    <script>
+        (function () {
+            var toggle  = document.getElementById('sidebar-toggle');
+            var sidebar = document.getElementById('sidebar');
+            var overlay = document.getElementById('sidebar-overlay');
+
+            if (!toggle || !sidebar || !overlay) return;
+
+            function openSidebar() {
+                sidebar.classList.add('open');
+                overlay.classList.add('visible');
+                toggle.setAttribute('aria-expanded', 'true');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('visible');
+                toggle.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            }
+
+            toggle.addEventListener('click', function () {
+                sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+            });
+
+            // Close when tapping the overlay
+            overlay.addEventListener('click', closeSidebar);
+
+            // Close when a nav link is tapped (mobile UX — no stale drawer)
+            sidebar.querySelectorAll('nav a').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth <= 768) closeSidebar();
+                });
+            });
+
+            // Close drawer on viewport resize to desktop
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 768) closeSidebar();
+            });
+        })();
+    </script>
+    {% endif %}
+
     <!-- ── AI MENTOR CHAT UI ── -->
     {% if 'user_id' in session %}
     <div id="ai-chat-btn" onclick="toggleChat()">
@@ -58,7 +115,9 @@
 
     <div id="ai-chat-panel">
         <div class="chat-header">
-            <h4 style="margin: 0; font-size: 1.1rem; color: #fff;" class="flex"><i data-lucide="cpu" style="width: 18px; margin-right: 8px;"></i> AI Mentor</h4>
+            <h4 style="margin: 0; font-size: 1.1rem; color: #fff;" class="flex">
+                <i data-lucide="cpu" style="width: 18px; margin-right: 8px;"></i> AI Mentor
+            </h4>
             <i data-lucide="x" style="cursor: pointer; color: var(--text-muted);" onclick="toggleChat()"></i>
         </div>
         <div class="chat-body" id="chat-messages">
@@ -72,11 +131,16 @@
             </div>
         </div>
         <div class="chat-footer">
-            <input type="text" id="chat-input" class="glass-input" placeholder="Ask about your skills..." onkeypress="handleChatEnter(event)" style="flex: 1; padding: 10px 14px; font-size: 0.85rem;">
-            <button class="glass-btn glass-btn-primary" onclick="sendChat()" style="padding: 10px 14px;"><i data-lucide="send" style="width: 16px;"></i></button>
+            <input type="text" id="chat-input" class="glass-input"
+                   placeholder="Ask about your skills..."
+                   onkeypress="handleChatEnter(event)"
+                   style="flex: 1; padding: 10px 14px; font-size: 0.85rem;">
+            <button class="glass-btn glass-btn-primary" onclick="sendChat()" style="padding: 10px 14px;">
+                <i data-lucide="send" style="width: 16px;"></i>
+            </button>
         </div>
     </div>
-    
+
     <script>
         let chatHistory = [];
 
@@ -92,24 +156,29 @@
         async function sendChat(forceMessage = null) {
             const input = document.getElementById('chat-input');
             const msg = forceMessage || input.value.trim();
-            if(!msg) return;
+            if (!msg) return;
 
             input.value = '';
-            
-            // Hide quick prompts as requested
-            const quickPrompts = document.getElementById('quick-prompts');
-            if(quickPrompts) quickPrompts.style.display = 'none';
 
-            // Push User bubble to DOM
+            // Hide quick prompts after first use
+            const quickPrompts = document.getElementById('quick-prompts');
+            if (quickPrompts) quickPrompts.style.display = 'none';
+
             const chatBody = document.getElementById('chat-messages');
-            chatBody.insertAdjacentHTML('beforeend', `<div class="chat-bubble bubble-user">${msg.replace(/</g, "&lt;")}</div>`);
+
+            // User bubble
+            chatBody.insertAdjacentHTML('beforeend',
+                `<div class="chat-bubble bubble-user">${msg.replace(/</g, '&lt;')}</div>`
+            );
             chatBody.scrollTop = chatBody.scrollHeight;
 
-            // Push simulated typing DOM state
+            // Typing indicator
             const typingId = 'typing-' + Date.now();
             chatBody.insertAdjacentHTML('beforeend', `
                 <div class="chat-bubble bubble-ai typing-indicator" id="${typingId}">
-                    <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
                 </div>
             `);
             chatBody.scrollTop = chatBody.scrollHeight;
@@ -117,32 +186,40 @@
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: msg, history: chatHistory })
                 });
 
-                document.getElementById(typingId).remove();
+                const typingEl = document.getElementById(typingId);
+                if (typingEl) typingEl.remove();
 
                 const data = await response.json();
-                
+
                 if (response.status === 400) {
-                    // Inject graceful strict error block as native chat frame inline
-                    chatBody.insertAdjacentHTML('beforeend', `<div class="chat-bubble bubble-error">${data.error}</div>`);
-                } else if(data.reply) {
-                    // Process line breaks natively allowing paragraph outputs
+                    chatBody.insertAdjacentHTML('beforeend',
+                        `<div class="chat-bubble bubble-error">${data.error}</div>`
+                    );
+                } else if (data.reply) {
                     const formattedReply = data.reply.replace(/\n/g, '<br>');
-                    chatBody.insertAdjacentHTML('beforeend', `<div class="chat-bubble bubble-ai">${formattedReply}</div>`);
+                    chatBody.insertAdjacentHTML('beforeend',
+                        `<div class="chat-bubble bubble-ai">${formattedReply}</div>`
+                    );
                     chatHistory.push({ sender: 'user', text: msg });
                     chatHistory.push({ sender: 'assistant', text: data.reply });
                 }
             } catch (err) {
-                document.getElementById(typingId)?.remove();
-                chatBody.insertAdjacentHTML('beforeend', `<div class="chat-bubble bubble-error">Network disconnection. Wait a moment and try again.</div>`);
+                const typingEl = document.getElementById(typingId);
+                if (typingEl) typingEl.remove();
+                chatBody.insertAdjacentHTML('beforeend',
+                    `<div class="chat-bubble bubble-error">Network disconnection. Wait a moment and try again.</div>`
+                );
             }
+
             chatBody.scrollTop = chatBody.scrollHeight;
-            lucide.createIcons(); // refresh dynamically added icons if AI dictates code
+            lucide.createIcons();
         }
     </script>
     {% endif %}
+
 </body>
 </html>
