@@ -64,22 +64,24 @@
 
   /* ── Section ── */
   .skills-galaxy-section {
-    padding: 80px 16px 60px; /* reduced bottom padding */
+    padding: 80px 0 80px;     /* zero horizontal padding — let children handle it */
     position: relative;
     overflow: hidden;
-  }
-  @media (max-width: 768px) {
-    .skills-galaxy-section { 
-        padding-top: 80px; /* was 120px — too much */
-        padding-bottom: 40px;
-    }
+    width: 100%;
   }
 
-  .galaxy-header { margin-bottom: 52px; }
-  /* Tighten the galaxy header on mobile */
+  @media (max-width: 768px) {
+    .skills-galaxy-section { padding: 60px 0 48px; }
+  }
+
+  .galaxy-header {
+    margin-bottom: 40px;
+    padding: 0 24px;          /* add horizontal padding here instead */
+  }
+
   @media (max-width: 640px) {
-      .galaxy-header { margin-bottom: 28px; } /* was 52px */
-      .galaxy-subtitle { font-size: 0.95rem; }
+    .galaxy-header { margin-bottom: 24px; }
+    .galaxy-subtitle { font-size: 0.9rem; }
   }
   .galaxy-eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
@@ -103,16 +105,20 @@
   /* ── Filter bar ── */
   .category-filters {
     display: flex;
-    flex-wrap: nowrap; /* prevent wrapping */
-    justify-content: flex-start;
-    gap: 8px; 
-    margin-bottom: 24px; 
-    padding: 0 16px;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 0 24px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* hide scrollbar Firefox */
+    scrollbar-width: none;
   }
-  .category-filters::-webkit-scrollbar { display: none; } /* hide scrollbar Chrome */
+  .category-filters::-webkit-scrollbar { display: none; }
+
+  @media (max-width: 768px) {
+    .category-filters { justify-content: flex-start; }
+  }
   .filter-btn {
     padding: 8px 18px; border-radius: 9999px;
     font-size: 0.8rem; font-weight: 500;
@@ -135,23 +141,20 @@
   /* ── Canvas container ── */
   .galaxy-canvas-container {
     position: relative;
-    height: 420px; /* was 560px — too tall for mobile */
-    width: 100%; 
-    max-width: 980px; 
+    height: 520px;
+    width: 100%;
+    max-width: 100%;          /* don't constrain width here */
     margin: 0 auto;
-    border-radius: 24px; 
+    border-radius: 24px;
     overflow: hidden;
-    background: #050a12; 
+    background: #050a12;
     border: 1px solid rgba(255,255,255,0.1);
     box-shadow: 0 25px 60px rgba(0,0,0,0.6);
   }
-  @media (min-width: 768px) { 
-    .galaxy-canvas-container { height: 660px; } 
-  }
-  @media (max-width: 640px) { 
-    .galaxy-canvas-container { height: 380px; } /* was 500px */
-    .filter-btn { padding: 6px 12px; font-size: 0.72rem; }
-  }
+
+  @media (min-width: 1024px) { .galaxy-canvas-container { height: 640px; } }
+  @media (max-width: 768px)  { .galaxy-canvas-container { height: 360px; border-radius: 16px; } }
+  @media (max-width: 480px)  { .galaxy-canvas-container { height: 300px; border-radius: 12px; } }
 
   /* ── Hint text ── */
   .galaxy-hint-text {
@@ -319,18 +322,28 @@
   ───────────────────────────────────────── */
   function buildMapGalaxies() {
     const {W,H} = getSize();
-    const cx = W/2, cy = H * .46;
-    const rx = Math.min(W*.32, 260), ry = Math.min(H*.28, 200);
-    const n  = GALAXIES.length;
-    mapGalaxies = GALAXIES.map((g,i) => {
-      const angle = (i/n)*Math.PI*2 - Math.PI/2;
+    const cx = W/2, cy = H * .44;   /* slightly higher center */
+
+    /* Scale radii to actual container size */
+    const rx = Math.min(W * .36, 280);
+    const ry = Math.min(H * .33, 210);
+
+    /* Planet size scales with container */
+    const baseR = Math.min(W, H) < 400 ? 36 : Math.min(W, H) < 600 ? 46 : 54;
+
+    const n = GALAXIES.length;
+    mapGalaxies = GALAXIES.map((g, i) => {
+      const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
       return {
         ...g,
-        cx: cx + Math.cos(angle)*rx,
-        cy: cy + Math.sin(angle)*ry,
-        radius: Math.min(W,H) < 500 ? 42 : 52,
-        orbs: Array.from({length:3},(_,j) => ({
-          angle: (j/3)*Math.PI*2, dist: 24+j*8, speed:.4+j*.15, r:3.5-j*.7
+        cx: cx + Math.cos(angle) * rx,
+        cy: cy + Math.sin(angle) * ry,
+        radius: baseR,
+        orbs: Array.from({length: 3}, (_, j) => ({
+          angle: (j/3) * Math.PI * 2,
+          dist: 22 + j * 7,
+          speed: .4 + j * .15,
+          r: 3.2 - j * .6
         }))
       };
     });
