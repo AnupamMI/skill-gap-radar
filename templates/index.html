@@ -64,15 +64,23 @@
 
   /* ── Section ── */
   .skills-galaxy-section {
-    padding: 80px 16px 100px;
+    padding: 80px 16px 60px; /* reduced bottom padding */
     position: relative;
     overflow: hidden;
   }
   @media (max-width: 768px) {
-    .skills-galaxy-section { padding-top: 120px; }
+    .skills-galaxy-section { 
+        padding-top: 80px; /* was 120px — too much */
+        padding-bottom: 40px;
+    }
   }
 
   .galaxy-header { margin-bottom: 52px; }
+  /* Tighten the galaxy header on mobile */
+  @media (max-width: 640px) {
+      .galaxy-header { margin-bottom: 28px; } /* was 52px */
+      .galaxy-subtitle { font-size: 0.95rem; }
+  }
   .galaxy-eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 0.85rem; font-weight: 600; letter-spacing: 0.1em;
@@ -94,9 +102,17 @@
 
   /* ── Filter bar ── */
   .category-filters {
-    display: flex; flex-wrap: wrap; justify-content: center;
-    gap: 8px; margin-bottom: 32px; padding: 0 16px;
+    display: flex;
+    flex-wrap: nowrap; /* prevent wrapping */
+    justify-content: flex-start;
+    gap: 8px; 
+    margin-bottom: 24px; 
+    padding: 0 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* hide scrollbar Firefox */
   }
+  .category-filters::-webkit-scrollbar { display: none; } /* hide scrollbar Chrome */
   .filter-btn {
     padding: 8px 18px; border-radius: 9999px;
     font-size: 0.8rem; font-weight: 500;
@@ -119,13 +135,23 @@
   /* ── Canvas container ── */
   .galaxy-canvas-container {
     position: relative;
-    height: 560px; width: 100%; max-width: 980px; margin: 0 auto;
-    border-radius: 24px; overflow: hidden;
-    background: #050a12; border: 1px solid rgba(255,255,255,0.1);
+    height: 420px; /* was 560px — too tall for mobile */
+    width: 100%; 
+    max-width: 980px; 
+    margin: 0 auto;
+    border-radius: 24px; 
+    overflow: hidden;
+    background: #050a12; 
+    border: 1px solid rgba(255,255,255,0.1);
     box-shadow: 0 25px 60px rgba(0,0,0,0.6);
   }
-  @media (min-width: 768px)  { .galaxy-canvas-container { height: 660px; } }
-  @media (max-width: 640px)  { .galaxy-canvas-container { height: 500px; } .filter-btn { padding: 6px 14px; font-size: 0.75rem; } }
+  @media (min-width: 768px) { 
+    .galaxy-canvas-container { height: 660px; } 
+  }
+  @media (max-width: 640px) { 
+    .galaxy-canvas-container { height: 380px; } /* was 500px */
+    .filter-btn { padding: 6px 12px; font-size: 0.72rem; }
+  }
 
   /* ── Hint text ── */
   .galaxy-hint-text {
